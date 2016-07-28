@@ -6,27 +6,34 @@ peddler.Views = peddler.Views || {};
     'use strict';
 
     peddler.Views.VisualView = Backbone.View.extend({
-        // template: JST['app/scripts/templates/card.ejs'],
-        // errorTemplate: JST['app/scripts/templates/card-err.ejs'],
+        template: _.template("<div class=\"item\" style=\"left: <%= index %>px!important\"><a href=\"<%= link %>\"><img src=\"<%= img %>\"></a></div>"),
         events: {
         },
-        init: function() {
+        initialize: function() {
         	var _this = this;
-        	this.freeze = false;
-        	this.category = this.options.category || 0;
+            // this.template = _.template("<div class=\"item\"><a href=\"<%= link %><img src=\"<%= img %>\"></a></div>"),
 			this.collection.fetch({
                 success: function() {
-                    console.log(JSON.stringify(_this.collection));
                     _this.render();
                 },
                 error: function() {
                     _this.renderError();
                 }
             })
+            this.listenTo(this.collection, 'reset', this.render);
         },
 
         render: function() {
-	        console.log(this.collection)
+	        console.log("Rendering VisualView",this.collection)
+            var _this = this
+            _this.collection.each(function(model,index,list){
+                // var o = data.property
+                 $(_this.el).append(_this.template({
+                    link: model.get("link"),
+                    img:model.get("img"),
+                    index: model.get("price")
+                }));
+            })
         },
 
         resize: function() {

@@ -208,7 +208,14 @@ app.use('/items',function(req, res, next) {
 				obj.id = o.id ? o.id : ""
 				obj.img = o.images["237x"].url ? o.images["237x"].url : ""
 				obj.link = o.link ? o.link : ""
-				obj.price = o.rich_metadata ? o.rich_metadata.products[0].offer_summary.price : "$100"
+
+				var price = o.rich_metadata.products[0].offer_summary.price
+
+				// Adjust for the aussies only for now
+				var price_adjust = price.split("$")[0] == "A" ? price.split("$")[1] * .75 : price.split("$")[1] 
+
+				obj.price = price_adjust
+
 			
 				console.log(obj)
 				items.push(obj)
