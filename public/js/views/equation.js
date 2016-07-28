@@ -4,8 +4,8 @@ peddler.Views = peddler.Views || {};
     'use strict';
 
     peddler.Views.EquationView = Backbone.View.extend({
-        template: JST['app/scripts/templates/card.ejs'],
-        errorTemplate: JST['app/scripts/templates/card-err.ejs'],
+        // template: JST['app/scripts/templates/card.ejs'],
+        // errorTemplate: JST['app/scripts/templates/card-err.ejs'],
         events: {
         },
         init: function() {

@@ -26,7 +26,7 @@ window.peddler = {
 
         this.Init.Equation = new this.Views.EquationView({
             el: '#calculate',
-            collection:this.Inst.CardCollection
+            collection:this.Inst.pinCollection
         });
 
         _.each(this.Init, function(v){

@@ -34,7 +34,18 @@ app.use('/user',function(req,res,next){
         });
 })
 
-app.use('/get_pins',function(req, res, next) {
+app.use('/user',function(req,res,next){
+	 strava.athlete.get({id:10961941},function(err,payload) {
+            if(!err) {
+                console.log(payload);
+            }
+            else {
+                console.log(err);
+            }
+        });
+})
+
+app.use('/items',function(req, res, next) {
 	
 	pin.getPinsFromBoard("ayla-bikes", true, function (pins) {
     	console.log(pins)
