@@ -1,0 +1,16 @@
+extends ./layout.jade
+
+block title
+	#peddler
+		//- h1 Peddler
+
+block authenticate
+	#auth
+		.modal
+			.strava
+				div Link your Strava
+				a(href="/auth")
+					img(src="/img/strava.png")
+			.pinterest
+				div What's your Board
+				span.editable(contenteditable="true") Board ID

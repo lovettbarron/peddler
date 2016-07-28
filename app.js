@@ -17,61 +17,94 @@ var express = require('express')
     , passport = require('passport')
     , StravaStrategy = require('passport-strava-oauth2').Strategy
     , strava = require('strava-v3')
-    , pinterest = require('pinterest-api');
+    , pinterest = require('pinterest-api')
+    , mongoose = require('mongoose');
 
-app.use(express.static(__dirname + '/views')); // set the static files location for the static html
-app.use(express.static(__dirname + '/public')); // set the static files location /public/img will be /img for users
+app.use(express.static(__dirname + '/views'));
+app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'jade');
-app.use(morgan('dev'));                     // log every request to the console
-app.use(bodyParser());                      // pull information from html in POST
-app.use(methodOverride());                  // simulate DELETE and PUT
-
-app.get('/', function(req, res, next) {
-    res.render('index');
-});
-
+app.use(morgan('dev'));  
+app.use(bodyParser());   
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(methodOverride());                  
 var pin = pinterest("readywater");
 
-// STRAVA METHODS
+// Mongoose
+var User = require('./User.js');
+mongoose.connect('mongodb://localhost/peddler-test');
+
+
+// STRAVA METHODS (Auth and passport)
+passport.serializeUser(function(user, done) {
+	console.log(user)
+    done(null, user._id);
+});
+
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function (err, user) {
+      done(err, user);
+    });
+});
 
 passport.use(new StravaStrategy({
     clientID: process.env.STRAVA_CLIENT_ID,
     clientSecret: process.env.STRAVA_CLIENT_SECRET,
-    callbackURL: "http://127.0.0.1:3000/auth/strava/callback"
+    callbackURL: "http://127.0.0.1:3000/auth/callback"
   },
+   // function(accessToken, refreshToken, profile, cb) {
+   //  User.findOrCreate({ stravaId: profile.id }, function (err, user) {
+   //    return cb(err, user);
+   //  });
   function(accessToken, refreshToken, profile, done) {
-    // asynchronous verification, for effect...
-    process.nextTick(function () {
-      return done(null, profile);
+    User.findOneAndUpdate(
+    		{id:profile.id}, 
+    		{id:profile.id}, 
+    		{upsert:true}, function(err, user) {
+      if(err) {
+        return done(err);
+      } else {
+        return done(null, user);
+      }
     });
+    // process.nextTick(function () {
+    //   return done(null, profile);
+    // });
   }
 ));
 
-app.get('/auth',
+app.use('/auth',
   passport.authenticate('strava'));
 
-app.get('/auth/callback', 
+app.use('/auth/callback', 
   passport.authenticate('strava', { failureRedirect: '/login' }),
   function(req, res) {
     res.redirect('/');
 });
 
+// Main index
+app.use('/', function(req, res, next) {
+	console.log(req.passport)
+	  if (req.user == undefined) {
+            res.redirect('/login');
+        } else {
+            res.render('auth');
+            console.log(req.user)
+        }
+});
+
+app.use('/login', function(req, res, next) {
+	console.log(req.passport)
+	  if (req.user == undefined) {
+            res.render('auth');
+        } else {
+            res.redirect('/');
+        }
+});
 
 
-
-
-// app.use('/auth',function(req,res,next){
-// 	res.redirect(strava.oauth.getRequestAccessURL({scope:"view_private"}))
-// })
-
-// app.use('/token_exchange',function(req,res,next){
-// 	strava.oauth.getToken(code,function(err,payload) {
-// 	  console.log(payload);
-// 	})
-// })
-
-app.use('/user',passport.authenticate('strava', { session: false }),function(req,res,next){
-	 strava.athletes.stats({},function(err,payload) {
+app.use('/user',function(req,res,next){
+	 strava.athletes.stats({id:req.user},function(err,payload) {
             if(!err) {
                 console.log(payload);
                 res.setHeader('Content-Type', 'application/json');
@@ -93,11 +126,28 @@ app.use('/items',function(req, res, next) {
 			keys.push(pins.data[v].id)
 		}
 
-		console.log(keys)
+		// console.log(keys)
 
 		pinterest.getDataForPins(keys,function(data) {
+			var items = []
+			// Yeah... rewrite this
+			for (var v in data.data) {
+				var obj = {}
+				var o = data.data[v]
+				if(o.rich_metadata == null) continue
+
+				obj.id = o.id ? o.id : ""
+				obj.img = o.images["237x"].url ? o.images["237x"].url : ""
+				obj.link = o.link ? o.link : ""
+				obj.price = o.rich_metadata ? o.rich_metadata.products[0].offer_summary.price : "$100"
+			
+				console.log(obj)
+				items.push(obj)
+			}
+
+
 			res.setHeader('Content-Type', 'application/json');
-	    	res.send(JSON.stringify(data))
+	    	res.send(JSON.stringify(items))
 		})
 
     	console.log(pins)

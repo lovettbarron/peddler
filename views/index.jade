@@ -5,7 +5,7 @@ block title
 		//- h1 Peddler
 
 block history
-	#history.hide
+	#history
 		.title Claimed
 		.bucket
 			.item
@@ -15,13 +15,13 @@ block history
 
 
 block visualizer
-	#visualizer.hide
+	#visualizer
 		.line
 		.marker
 		.label Unclaimed Miles
 
 block calculate
-	#calculate.hide
+	#calculate
 		.fraction
 			.numerator
 				span.editable(contenteditable="true") Monthly Budget
@@ -36,7 +36,7 @@ block calculate
 			span.small per km
 
 block authenticate
-	#auth
+	#auth.hide
 		.modal
 			.strava
 				div Link your Strava
