@@ -63,7 +63,7 @@ app.get('/auth/callback',
 // 	})
 // })
 
-app.use('/user',function(req,res,next){
+app.use('/user',passport.authenticate('strava', { session: false }),function(req,res,next){
 	 strava.athletes.stats({},function(err,payload) {
             if(!err) {
                 console.log(payload);
