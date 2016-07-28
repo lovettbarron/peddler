@@ -2,6 +2,7 @@
 
 
 window.peddler = {
+    auth: false,
     Models: {},
     Collections: {},
     Views: {},
