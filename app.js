@@ -7,6 +7,8 @@ var express = require('express')
     , app = express()
     , port = process.env.PORT || 3000
     , router = express.Router()
+    , passport = require('passport')
+    , StravaStrategy = require('passport-strava-oauth2')
     , strava = require('strava-v3')
     , pinterest = require('pinterest-api');
 
@@ -25,15 +27,41 @@ app.get('/', function(req, res, next) {
 
 // STRAVA METHODS
 
-app.use('/auth',function(req,res,next){
-	res.redirect(strava.oauth.getRequestAccessURL({scope:"view_private"}))
-})
+passport.use(new StravaStrategy({
+    clientID: STRAVA_CLIENT_ID,
+    clientSecret: STRAVA_CLIENT_SECRET,
+    callbackURL: "http://127.0.0.1:3000/auth/strava/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+      return done(null, profile);
+    });
+  }
+));
 
-app.use('/token_exchange',function(req,res,next){
-	strava.oauth.getToken(code,function(err,payload) {
-	  console.log(payload);
-	})
-})
+app.get('/auth',
+  passport.authenticate('strava'));
+
+app.get('/auth/callback', 
+  passport.authenticate('strava', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+});
+
+
+
+
+
+// app.use('/auth',function(req,res,next){
+// 	res.redirect(strava.oauth.getRequestAccessURL({scope:"view_private"}))
+// })
+
+// app.use('/token_exchange',function(req,res,next){
+// 	strava.oauth.getToken(code,function(err,payload) {
+// 	  console.log(payload);
+// 	})
+// })
 
 app.use('/user',function(req,res,next){
 	 strava.athletes.stats({},function(err,payload) {

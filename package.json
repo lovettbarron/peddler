@@ -22,6 +22,8 @@
     "jade": "*",
     "method-override": "^1.0.0",
     "morgan": "^1.0.0",
+    "passport": "^0.3.2",
+    "passport-strava-oauth2": "^0.1.3",
     "pinterest-api": "^1.1.4",
     "strava-v3": "^1.12.1"
   }
