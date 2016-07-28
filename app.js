@@ -8,6 +8,8 @@
 //
 
 var express = require('express')
+	, connect = require('connect')
+	, sessions = require('express-session')
     , morgan = require('morgan')
     , bodyParser = require('body-parser')
     , methodOverride = require('method-override')
@@ -25,6 +27,7 @@ app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'jade');
 app.use(morgan('dev'));  
 app.use(bodyParser());   
+app.use(sessions({ secret: 'shutuplegs' }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride());                  
@@ -37,6 +40,7 @@ mongoose.connect('mongodb://localhost/peddler-test');
 
 // STRAVA METHODS (Auth and passport)
 passport.serializeUser(function(user, done) {
+	console.log("serializeUser")
 	console.log(user)
     done(null, user._id);
 });
@@ -77,34 +81,44 @@ app.use('/auth',
   passport.authenticate('strava'));
 
 app.use('/auth/callback', 
-  passport.authenticate('strava', { failureRedirect: '/login' }),
+  passport.authenticate('strava', { 
+  	successRedirect: '/',
+  	failureRedirect: '/login' }),
   function(req, res) {
     res.redirect('/');
 });
 
+function authenticationMiddleware() {  
+  return function (req, res, next) {
+    if (req.isAuthenticated()) {
+      return next()
+    }
+    res.redirect('/login')
+  }
+}
+
 // Main index
-app.use('/', function(req, res, next) {
-	console.log(req.passport)
-	  if (req.user == undefined) {
-            res.redirect('/login');
-        } else {
-            res.render('auth');
-            console.log(req.user)
-        }
+app.get('/', authenticationMiddleware(), function(req, res, next) {
+	console.log("Rendering index")
+	console.log(req.user)
+    res.render('index');
+    console.log(req.user)
 });
 
-app.use('/login', function(req, res, next) {
-	console.log(req.passport)
-	  if (req.user == undefined) {
-            res.render('auth');
-        } else {
-            res.redirect('/');
-        }
+app.get('/login', function(req, res, next) {
+	console.log(req.user)
+    res.render('auth');
 });
 
 
-app.use('/user',function(req,res,next){
-	 strava.athletes.stats({id:req.user},function(err,payload) {
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
+
+app.get('/user',function(req,res,next){
+	 strava.athletes.stats({id:req.user.id},function(err,payload) {
             if(!err) {
                 console.log(payload);
                 res.setHeader('Content-Type', 'application/json');
