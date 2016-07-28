@@ -5,11 +5,11 @@ peddler.Collections = peddler.Collections || {};
 (function () {
     'use strict';
 
-    peddler.Collections.CardsCollection = Backbone.Collection.extend({
+    peddler.Collections.PinCollection = Backbone.Collection.extend({
 
-        model: peddler.Models.CardModel,
+        model: peddler.Models.PinModel,
 
-    	url: 'scripts/data/bio.json',
+    	url: '/items',
 
     	selected: [],
 
