@@ -23,21 +23,22 @@ app.get('/', function(req, res, next) {
     res.render('index');
 });
 
-app.use('/user',function(req,res,next){
-	strava.athlete.get({},function(err,payload) {
-            if(!err) {
-                console.log(payload);
-            }
-            else {
-                console.log(err);
-            }
-        });
+app.use('/auth',function(req,res,next){
+	res.redirect(strava.oauth.getRequestAccessURL({scope:"view_private"}))
+})
+
+app.use('/token_exchange',function(req,res,next){
+	strava.oauth.getToken(code,function(err,payload) {
+	  console.log(payload);
+	})
 })
 
 app.use('/user',function(req,res,next){
-	 strava.athlete.get({id:10961941},function(err,payload) {
+	 strava.athletes.stats({},function(err,payload) {
             if(!err) {
                 console.log(payload);
+                res.setHeader('Content-Type', 'application/json');
+		    	res.send(JSON.stringify(payload))
             }
             else {
                 console.log(err);
@@ -48,11 +49,24 @@ app.use('/user',function(req,res,next){
 app.use('/items',function(req, res, next) {
 	
 	pin.getPinsFromBoard("ayla-bikes", true, function (pins) {
+		var keys = []
+
+		for (var v in pins.data) {
+			keys.push(pins.data[v].id)
+		}
+
+		console.log(keys)
+
+		pinterest.getDataForPins(keys,function(data) {
+			res.setHeader('Content-Type', 'application/json');
+	    	res.send(JSON.stringify(data))
+		})
+
     	console.log(pins)
-    	res.setHeader('Content-Type', 'application/json');
-    	res.send(JSON.stringify(pins))
+    	
 	});
 })
+
 
 app.listen(port);
 console.log('App running on port', port);

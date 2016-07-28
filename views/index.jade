@@ -34,3 +34,19 @@ block calculate
 			span.small $
 			span.result 0
 			span.small per km
+
+block authenticate
+	#auth
+		.strava
+			div Link your Strava
+			a(href=https://www.strava.com/oauth/authorize?
+  client_id=12702
+  &response_type=code
+  &redirect_uri=peddlerapp.herokuapp.com
+  &scope=write
+  &state=mystate
+  &approval_prompt=force
+)
+		.pinterest
+			div What's your Board
+			span.editable Board ID
