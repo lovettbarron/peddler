@@ -1,13 +1,28 @@
-var express = require('express');
-var app = express();
 
 var defaults = require('./keys.js')
+var express = require('express')
+    , morgan = require('morgan')
+    , bodyParser = require('body-parser')
+    , methodOverride = require('method-override')
+    , app = express()
+    , port = process.env.PORT || 3000
+    , router = express.Router()
+    , strava = require('strava-v3')
+    , pinterest = require('pinterest-api');
 
-app.get('/', function (req, res) {
-  
+app.use(express.static(__dirname + '/views')); // set the static files location for the static html
+app.use(express.static(__dirname + '/public')); // set the static files location /public/img will be /img for users
+app.set('view engine', 'jade');
+app.use(morgan('dev'));                     // log every request to the console
+app.use(bodyParser());                      // pull information from html in POST
+app.use(methodOverride());                  // simulate DELETE and PUT
+
+router.get('/', function(req, res, next) {
+    res.render('index.jade');
 });
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
-  console.log(defaults)
-});
+app.use('/', router);
+app.use('/get_pins',router)
+
+app.listen(port);
+console.log('App running on port', port);

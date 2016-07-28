@@ -1,1 +1,30 @@
-p Welcome to #{title}
+extends ./layout.jade
+
+block title
+	#peddler
+		//- h1 Peddler
+
+block history
+	#history
+		.title Claimed
+
+
+block visualizer
+	#visualizer
+		.line
+		.label Unclaimed Miles
+
+block calculate
+	#calculate
+		.fraction
+			.numerator
+				span.editable(contenteditable="true") Monthly Budget
+				//- span.small *12
+			.line
+			.denominator
+				span.editable(contenteditable="true") Yearly Goal
+		.equals
+			spam.big =
+			span.small $
+			span.result 0
+			span.small per km

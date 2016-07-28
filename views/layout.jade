@@ -1,4 +1,4 @@
-!!! 5
+doctype html
 //- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/
 //if lt IE 7
   | <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en">
@@ -16,18 +16,27 @@ head
   meta(name="author", content="#{author}")
   meta(name="viewport", content="width=device-width,initial-scale=1")
   link(rel="stylesheet", href="/css/style.css")
+  link(rel="stylesheet", href="/css/design.css")
+  link(href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css')
   script(src="/js/libs/modernizr-2.0.6.min.js")
 
 body
   header
-  div(role="main")!= body
+  block title
+  block history
+  block visualizer
+  block calculate
   footer
   script(src="//ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js")
-  script
-    window.jQuery || document.write('<script src=\"js/libs/jquery-1.7.min.js\"><\\/script>')
-  script(defer, src="js/plugins.js")
+  //- script
+    //- window.jQuery || document.write('<script src=\"js/libs/jquery-1.7.min.js\"><\\/script>')
+  script(defer, src="js/lib/d3.min.js")
+  script(defer, src="js/lib/underscore-min.js")
+  script(defer, src="js/lib/backbone-min.js")
+  script(defer, src="js/lib/plugins.js")
   script(defer, src="js/script.js")
-  script
+  script(defer, src="js/app.js")
+  script.
     var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview'],['_trackPageLoadTime']];
     (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
     g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
