@@ -82,9 +82,21 @@ app.use('/auth',
 
 app.use('/auth/callback', 
   passport.authenticate('strava', { 
-  	successRedirect: '/',
   	failureRedirect: '/login' }),
   function(req, res) {
+  	 User.findOneAndUpdate(
+    		{id:req.user.id}, 
+    		{id:req.user.id,
+    		pin_username: req.session.pinid,
+    		pin_board: req.session.pinboard
+    		}, 
+    		{upsert:false}, function(err,user){
+    			if(err) {
+    				console.log("Failed to assoc pinterest w/ strava")
+    				res.redirect('/logout')
+    			}
+    		})
+
     res.redirect('/');
 });
 
@@ -99,14 +111,15 @@ function authenticationMiddleware() {
 
 // Main index
 app.get('/', authenticationMiddleware(), function(req, res, next) {
-	console.log("Rendering index")
-	console.log(req.user)
+	// console.log("Rendering index")
+	console.log(req.session.pinid)
+	console.log(req.session.pinboard)
     res.render('index');
-    console.log(req.user)
+    // console.log(req.user)
 });
 
 app.get('/login', function(req, res, next) {
-	console.log(req.user)
+	// console.log(req.user)
     res.render('auth');
 });
 
@@ -118,22 +131,64 @@ app.get('/logout', function(req, res){
 
 
 app.get('/user',function(req,res,next){
-	 strava.athletes.stats({id:req.user.id},function(err,payload) {
-            if(!err) {
-                console.log(payload);
-                res.setHeader('Content-Type', 'application/json');
+	User.find({id:req.user.id}, function(err,user) {
+		console.log("User obj",user)
+		 strava.athletes.stats({id:req.user.id},function(err,payload) {
+		    if(!err) {
+		        // console.log(payload);
+
+		        var obj = {}
+		        obj.id = req.user.id
+		        obj.yearly_km = payload.ytd_ride_totals.distance
+		        obj.budget = user.budget
+		        res.setHeader('Content-Type', 'application/json');
 		    	res.send(JSON.stringify(payload))
-            }
-            else {
-                console.log(err);
-            }
-        });
+		    }
+		    else {
+		        console.log(err);
+		    }
+		});
+	 })
+})
+
+app.put('user',function(req,res,next) {
+
 })
 
 // PINTEREST
+app.get('/user/pin-exist',function(req,res,next){
+	var p = pinterest(req.query.user)
+	var b = []
+	p.getBoards(true, function(boards) {
+		console.log(boards.data)
+		for(var v in boards.data) {
+			
+			// if(!boards[v]) continue
+			b.push(String(boards.data[v].href).split('/')[2])
+		}
+		res.setHeader('Content-Type', 'application/json');
+    	res.send(JSON.stringify(b))
+	})
+})
+
+app.put('/user/pin-config',function(req,res,next) {
+	req.session.pinid = req.query.user
+	req.session.pinboard = req.query.board
+	res.sendStatus(200)
+})
+
 app.use('/items',function(req, res, next) {
 	
-	pin.getPinsFromBoard("ayla-bikes", true, function (pins) {
+	User.find({id:req.user.id}, function(err,user) {
+		console.log("Returned user",user[0])
+		var p = pinterest(user[0].pin_username)
+		if(err) {
+			console.log("Some kind of error fetching pins",err)
+
+		}
+		 
+
+	p.getPinsFromBoard(user[0].pin_board, true, function (pins) {
 		var keys = []
 
 		for (var v in pins.data) {
@@ -166,7 +221,9 @@ app.use('/items',function(req, res, next) {
 
     	console.log(pins)
     	
-	});
+		});
+
+	})
 })
 
 

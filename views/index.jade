@@ -24,15 +24,15 @@ block calculate
 	#calculate
 		.fraction
 			.numerator
-				span.editable(contenteditable="true") Monthly Budget
+				span#numerator.editable(contenteditable="true") Monthly Budget
 				//- span.small *12
 			.line
 			.denominator
-				span.editable(contenteditable="true") Yearly Goal
+				span#denominator.editable(contenteditable="true") Yearly Goal
 		.equals
 			spam.big =
 			span.small $
-			span.result 0
+			span#results.result 0
 			span.small per km
 
 block authenticate
@@ -45,3 +45,4 @@ block authenticate
 			.pinterest
 				div What's your Board
 				span.editable(contenteditable="true") Board ID
+

@@ -6,9 +6,11 @@ peddler.Models = peddler.Models || {};
     peddler.Models.UserModel = Backbone.Model.extend({
 
         initialize: function() {
+            
         },
 
         defaults: {
+
         },
 
         validate: function(attrs, options) {

@@ -16,7 +16,7 @@ peddler.Views = peddler.Views || {};
         	this.category = this.options.category || 0;
 			this.collection.fetch({
                 success: function() {
-                    // console.log(JSON.stringify(_this.collection));
+                    console.log(JSON.stringify(_this.collection));
                     _this.render();
                 },
                 error: function() {
@@ -26,11 +26,7 @@ peddler.Views = peddler.Views || {};
         },
 
         render: function() {
-	        $(this.el).html(this.template({
-	        	category: this.collection.getCategoryName(this.category),
-            }));
-            this.resize();
-            this.getNewCard();
+	        console.log(this.collection)
         },
 
         resize: function() {

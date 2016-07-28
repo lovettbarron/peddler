@@ -11,7 +11,7 @@ window.peddler = {
     init: function () {
         'use strict';
 
-        this.Init.UserCollection = new this.Collections.UserCollection({
+        this.Init.User = new this.Collections.UserCollection({
                 model: new this.Models.UserModel()
             });
        
@@ -19,18 +19,26 @@ window.peddler = {
                 model: new this.Models.PinModel()
             });
 
+
+        this.Init.Auth = new this.Views.AuthView({
+            el: '#auth',
+            collection:this.Init.User,
+        });
+
+
         this.Init.Visual = new this.Views.VisualView({
             el: '#visualizer',
-            collection:this.Inst.pinCollection
+            collection:this.Init.pinCollection,
+            user: this.Init.User
         });
 
         this.Init.Equation = new this.Views.EquationView({
             el: '#calculate',
-            collection:this.Inst.pinCollection
+            collection: this.Init.User
         });
 
         _.each(this.Init, function(v){
-            v.init();
+            v.initialize();
         })
 
     },

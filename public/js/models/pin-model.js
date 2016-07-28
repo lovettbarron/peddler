@@ -2,7 +2,6 @@ peddler.Models = peddler.Models || {};
 
 (function () {
     'use strict';
-
     peddler.Models.PinModel = Backbone.Model.extend({
 
         initialize: function() {

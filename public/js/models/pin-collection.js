@@ -7,13 +7,13 @@ peddler.Collections = peddler.Collections || {};
 
     peddler.Collections.PinCollection = Backbone.Collection.extend({
 
-        model: peddler.Models.PinModel,
+        // model: peddler.Models.PinModel,s
 
-    	url: '/get_pins',
+    	url: '/items',
 
     	selected: [],
 
-        init: function() {
+        initialize: function() {
 
         },
 
