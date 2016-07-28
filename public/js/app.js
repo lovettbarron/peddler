@@ -6,16 +6,15 @@ window.peddler = {
     Collections: {},
     Views: {},
     Routers: {},
-    Inst: {},
     Init: {},
     init: function () {
         'use strict';
 
-        this.Inst.UserCollection = new this.Collections.UserCollection({
+        this.Init.UserCollection = new this.Collections.UserCollection({
                 model: new this.Models.UserModel()
             });
        
-        this.Inst.pinCollection = new this.Collections.PinCollection({
+        this.Init.pinCollection = new this.Collections.PinCollection({
                 model: new this.Models.PinModel()
             });
 

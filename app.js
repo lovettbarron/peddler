@@ -23,13 +23,14 @@ app.get('/', function(req, res, next) {
     res.render('index');
 });
 
+// STRAVA METHODS
+
 app.use('/auth',function(req,res,next){
 	res.redirect(strava.oauth.getRequestAccessURL({scope:"view_private"}))
 })
 
 app.use('/token_exchange',function(req,res,next){
-	strava.oauth.getToken(req,function(err,payload) {
-	  res.redirect("/")
+	strava.oauth.getToken(code,function(err,payload) {
 	  console.log(payload);
 	})
 })
@@ -47,6 +48,7 @@ app.use('/user',function(req,res,next){
         });
 })
 
+// PINTEREST
 app.use('/items',function(req, res, next) {
 	
 	pin.getPinsFromBoard("ayla-bikes", true, function (pins) {
