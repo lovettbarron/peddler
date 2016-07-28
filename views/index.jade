@@ -39,14 +39,8 @@ block authenticate
 	#auth
 		.strava
 			div Link your Strava
-			a(href=https://www.strava.com/oauth/authorize?
-  client_id=12702
-  &response_type=code
-  &redirect_uri=peddlerapp.herokuapp.com
-  &scope=write
-  &state=mystate
-  &approval_prompt=force
-)
+			a(href="/auth")
+				img(src="/img/strava.png")
 		.pinterest
 			div What's your Board
 			span.editable Board ID
