@@ -1,5 +1,11 @@
 
-var defaults = require('./keys.js') || ""
+// var defaults = require('./keys.js') || ""
+// use Setup a shell script to run
+// ##!/bin/bash
+// heroku config:set STRAVA_CLIENT_ID=
+// heroku config:set STRAVA_CLIENT_SECRET=
+// heroku config:set STRAVA_ACCESS_TOKEN=
+//
 
 var express = require('express')
     , morgan = require('morgan')
@@ -9,7 +15,7 @@ var express = require('express')
     , port = process.env.PORT || 3000
     , router = express.Router()
     , passport = require('passport')
-    , StravaStrategy = require('passport-strava-oauth2')
+    , StravaStrategy = require('passport-strava-oauth2').Strategy
     , strava = require('strava-v3')
     , pinterest = require('pinterest-api');
 
@@ -24,16 +30,13 @@ app.get('/', function(req, res, next) {
     res.render('index');
 });
 
-var STRAVA_CLIENT_ID = STRAVA_CLIENT_ID || defaults.keys.STRAVA_CLIENT_ID
-var STRAVA_CLIENT_SECRET = STRAVA_CLIENT_SECRET || defaults.keys.STRAVA_CLIENT_SECRET
-
 var pin = pinterest("readywater");
 
 // STRAVA METHODS
 
 passport.use(new StravaStrategy({
-    clientID: STRAVA_CLIENT_ID,
-    clientSecret: STRAVA_CLIENT_SECRET,
+    clientID: process.env.STRAVA_CLIENT_ID,
+    clientSecret: process.env.STRAVA_CLIENT_SECRET,
     callbackURL: "http://127.0.0.1:3000/auth/strava/callback"
   },
   function(accessToken, refreshToken, profile, done) {
