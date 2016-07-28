@@ -6,7 +6,7 @@ peddler.Views = peddler.Views || {};
     'use strict';
 
     peddler.Views.VisualView = Backbone.View.extend({
-        template: _.template("<div class=\"item\" style=\"left: <%= index %>px!important\"><a href=\"<%= link %>\"><img src=\"<%= img %>\"></a></div>"),
+        template: _.template("<div class=\"item\" style=\"left: <%= index %>%!important\"><a href=\"<%= link %>\"><img src=\"<%= img %>\"></a></div>"),
         events: {
         },
         initialize: function() {
@@ -31,7 +31,7 @@ peddler.Views = peddler.Views || {};
                  $(_this.el).append(_this.template({
                     link: model.get("link"),
                     img:model.get("img"),
-                    index: model.get("price")
+                    index: (model.get("price")/$(window).width())*100
                 }));
             })
         },
