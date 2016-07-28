@@ -28,7 +28,7 @@ app.use('/auth',function(req,res,next){
 })
 
 app.use('/token_exchange',function(req,res,next){
-	strava.oauth.getToken(code,function(err,payload) {
+	strava.oauth.getToken(req,function(err,payload) {
 	  console.log(payload);
 	})
 })
