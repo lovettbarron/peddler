@@ -10,6 +10,8 @@ var express = require('express')
     , strava = require('strava-v3')
     , pinterest = require('pinterest-api');
 
+    var pin = pinterest("readywater");
+
 app.use(express.static(__dirname + '/views')); // set the static files location for the static html
 app.use(express.static(__dirname + '/public')); // set the static files location /public/img will be /img for users
 app.set('view engine', 'jade');
@@ -17,12 +19,29 @@ app.use(morgan('dev'));                     // log every request to the console
 app.use(bodyParser());                      // pull information from html in POST
 app.use(methodOverride());                  // simulate DELETE and PUT
 
-router.get('/', function(req, res, next) {
-    res.render('index.jade');
+app.get('/', function(req, res, next) {
+    res.render('index');
 });
 
-app.use('/', router);
-app.use('/get_pins',router)
+app.use('/user',function(req,res,next){
+	strava.athlete.get({},function(err,payload) {
+            if(!err) {
+                console.log(payload);
+            }
+            else {
+                console.log(err);
+            }
+        });
+})
+
+app.use('/get_pins',function(req, res, next) {
+	
+	pin.getPinsFromBoard("ayla-bikes", true, function (pins) {
+    	console.log(pins)
+    	res.setHeader('Content-Type', 'application/json');
+    	res.send(JSON.stringify(pins))
+	});
+})
 
 app.listen(port);
 console.log('App running on port', port);
