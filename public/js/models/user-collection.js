@@ -5,11 +5,11 @@ peddler.Collections = peddler.Collections || {};
 (function () {
     'use strict';
 
-    peddler.Collections.PinCollection = Backbone.Collection.extend({
+    peddler.Collections.UserCollection = Backbone.Collection.extend({
 
-        model: peddler.Models.PinModel,
+        model: peddler.Models.UserModel,
 
-    	url: '/get_pins',
+    	url: '/items',
 
     	selected: [],
 
