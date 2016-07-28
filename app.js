@@ -1,5 +1,6 @@
 
-// var defaults = require('./keys.js')
+var defaults = require('./keys.js') || ""
+
 var express = require('express')
     , morgan = require('morgan')
     , bodyParser = require('body-parser')
@@ -12,8 +13,6 @@ var express = require('express')
     , strava = require('strava-v3')
     , pinterest = require('pinterest-api');
 
-    var pin = pinterest("readywater");
-
 app.use(express.static(__dirname + '/views')); // set the static files location for the static html
 app.use(express.static(__dirname + '/public')); // set the static files location /public/img will be /img for users
 app.set('view engine', 'jade');
@@ -24,6 +23,11 @@ app.use(methodOverride());                  // simulate DELETE and PUT
 app.get('/', function(req, res, next) {
     res.render('index');
 });
+
+var STRAVA_CLIENT_ID = STRAVA_CLIENT_ID || defaults.keys.STRAVA_CLIENT_ID
+var STRAVA_CLIENT_SECRET = STRAVA_CLIENT_SECRET || defaults.keys.STRAVA_CLIENT_SECRET
+
+var pin = pinterest("readywater");
 
 // STRAVA METHODS
 

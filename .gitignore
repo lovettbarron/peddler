@@ -5,6 +5,7 @@ npm-debug.log*
 
 #keys
 keys.js
+setup_env.sh
 
 # Runtime data
 pids
