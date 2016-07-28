@@ -1,5 +1,5 @@
 
-var defaults = require('./keys.js')
+// var defaults = require('./keys.js')
 var express = require('express')
     , morgan = require('morgan')
     , bodyParser = require('body-parser')
