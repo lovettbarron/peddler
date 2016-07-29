@@ -32,6 +32,12 @@ window.peddler = {
             user: this.Init.User
         });
 
+        this.Init.Claimed = new this.Views.ClaimView({
+            el: '#history',
+            collection:this.Init.pinCollection,
+            user: this.Init.User
+        });
+
         this.Init.Equation = new this.Views.EquationView({
             el: '#calculate',
             collection: this.Init.User

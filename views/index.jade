@@ -2,16 +2,16 @@ extends ./layout.jade
 
 block title
 	#peddler
+	#about
+		.name by 
+			a(href="http://andrewlb.com" target="_blank") andrewlb
 		//- h1 Peddler
 
 block history
 	#history
 		.title Claimed
 		.bucket
-			.item
-			.item
-			.item
-			.item
+			
 
 
 block visualizer
@@ -19,16 +19,19 @@ block visualizer
 		.line
 		.marker
 		.label Unclaimed Miles
+		.link
+			.treat Treat!
+			.own Claim
 
 block calculate
 	#calculate
 		.fraction
 			.numerator
-				span#numerator.editable(contenteditable="true") Monthly Budget
+				span#numerator.numeric.editable(contenteditable="true") Monthly Budget
 				//- span.small *12
 			.line
 			.denominator
-				span#denominator.editable(contenteditable="true") Yearly Goal
+				span#denominator.numeric.editable(contenteditable="true") Yearly Goal
 		.equals
 			spam.big =
 			span.small $
@@ -45,4 +48,3 @@ block authenticate
 			.pinterest
 				div What's your Board
 				span.editable(contenteditable="true") Board ID
-

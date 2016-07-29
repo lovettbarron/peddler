@@ -128,24 +128,44 @@ app.get('/logout', function(req, res){
   req.logout();
   res.redirect('/');
 });
-
-
+//////////
+// USER //
+//////////
 app.get('/user',function(req,res,next){
+
+	// Grab the user info from the db
 	User.find({id:req.user.id}, function(err,user) {
 		console.log("User obj",user)
+		// Query strava with updated info
 		 strava.athletes.stats({id:req.user.id},function(err,payload) {
 		    if(!err) {
 		        // console.log(payload);
 
 		        var obj = {}
 		        obj.id = req.user.id
-		        obj.yearly_km = payload.ytd_ride_totals.distance
+		        obj.yearly_km = payload.ytd_ride_totals.distance/1000
 		        obj.budget = user.budget
-		        res.setHeader('Content-Type', 'application/json');
-		    	res.send(JSON.stringify(payload))
+		        obj.claimed = user.items
+
+		        // Update user w/ new distance
+				User.findOneAndUpdate(
+					{id:req.user.id}, 
+					{
+					 yrlydist: payload.ytd_ride_totals.distance//1000
+					}, 
+					{upsert:false}, function(err,user){
+						if(err) {
+							console.log("Failed to update distance")
+							res.redirect('/logout')
+						} else {
+							console.log("Obj to send",obj)
+							res.setHeader('Content-Type', 'application/json');
+					    	res.send(JSON.stringify(obj))
+						}
+					})
 		    }
 		    else {
-		        console.log(err);
+		        console.log("Strava fail",err);
 		    }
 		});
 	 })
@@ -177,7 +197,32 @@ app.put('/user/pin-config',function(req,res,next) {
 	res.sendStatus(200)
 })
 
-app.use('/items',function(req, res, next) {
+// ITEMS
+app.use('/items/claim',function(req,res,next){
+	console.log("req.user",req.user)
+	console.log("req.session",req.session)
+	User.findByIdAndUpdate(
+		req.user.id, 
+		{$push: {"claimed":
+			{item_id: req.query.pinid, 
+			 date: Date.now, 
+			 cost: req.query.cost,}
+			}
+		}, 
+		{safe: true, upsert:true}, function(err,user){
+			if(err) {
+				console.log("claim fail :(")
+				res.redirect('/logout')
+			} else {
+				console.log("Claim success",user)
+				res.sendStatus(200)
+				User.save()
+			}
+	})
+})
+
+
+app.use('/items', function(req, res, next) {
 	
 	User.find({id:req.user.id}, function(err,user) {
 		console.log("Returned user",user[0])
@@ -232,7 +277,6 @@ app.use('/items',function(req, res, next) {
 
 	})
 })
-
 
 app.listen(port);
 console.log('App running on port', port);

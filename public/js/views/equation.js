@@ -25,6 +25,9 @@ peddler.Views = peddler.Views || {};
                     _this.renderError();
                 }
             })
+            $(document).on("input", ".numeric", function() {
+			    this.value = this.value.replace(/[^0-9\.]/g,'');
+			});
         },
 
         numeratorUpdate: function(e) {

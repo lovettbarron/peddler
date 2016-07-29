@@ -13,18 +13,37 @@ peddler.Collections = peddler.Collections || {};
 
     	selected: [],
 
-        initialize: function() {
+        user: {},
 
+        initialize: function(option) {
+            this.user = option.user || {}
         },
 
-        getCardByCategory: function(id,prev) {
-	        var list = _.map(this.pluck(id)[0].cards, function(v) {
-	        	return v.title
-	        });
-	        if(!_.isUndefined(prev)) list = _.difference(list,prev); // remove previous
-	        var len = _.size(list);
-	        return list[Math.floor(Math.random() * len)]
-        },
+       getMaxValue: function() {
+            return _.max(this.pluck("price"), function(o){
+                return o;});
+           },
+
+        claimPin: function(id,callback) {
+
+            var price = this.findWhere({id:id})
+
+            var endpoint = this.url + "/claim?pinid=" + id + "&cost=" + price.get("price")
+            console.log(endpoint)
+
+            $.ajax({
+                url : endpoint,
+                type : 'GET',
+                dataType:'json',
+                success : function(data) {              
+                    callback()
+                },
+                error : function(request,error)
+                {
+                    console.log("Request: "+JSON.stringify(request));
+                    callback()
+                }
+            });
+        }
     });
-
 })();
