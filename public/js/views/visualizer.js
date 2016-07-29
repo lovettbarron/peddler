@@ -66,11 +66,26 @@ peddler.Views = peddler.Views || {};
 
         updateMarker: function() {
             var _this = this
-            $(this.el).find('.marker').css('left',function() {
-                var dolla = ((_this.user.pluck("yearly_km"))/(_this.collection.getMaxValue()+50))*100
-                return dolla > 95 ? "95%" : dolla+"%"
-                 
+            this.user.fetch({
+                success: function() {
+                 $(_this.el).find('.marker').css('left',function() {
+                var dolla = ((_this.user.pluck("yearly_km")*_this.user.getUserStat().multipler)-_this.user.getUserStat().claimed)
+                var vizDolla = dolla/(_this.collection.getMaxValue()+50)
+                console.log("dolla",dolla, "vizdolla",vizDolla)
+                if(vizDolla > .95) {
+                    $(_this.el).find('#dolla').show()
+                    return "95%"
+                } else {
+                    $(_this.el).find('#dolla').hide()
+                    return (vizDolla*100)+"%"
+                }                 
             })
+                },
+                error: function() {
+                    _this.renderError();
+                }
+            })
+           
         },
 
         onHover: function(e) {

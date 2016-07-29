@@ -173,6 +173,13 @@ body {
 	color: #969699;
 } 
 
+#visualizer > .label.right {
+	position:absolute;
+	top: 20px; right: 0;
+	display: none;
+	transition: opacity 1s;
+}
+
 #visualizer > .link {
 	position:absolute;
 	top:0; left: 0;

@@ -15,17 +15,41 @@ peddler.Collections = peddler.Collections || {};
 
         },
 
-        getStat: function() {
+        getUserStat: function() {
             // CHANGE
-            var monthly_budget = 100
-            var yearly_goal = 5200
-
+            var user = this.findWhere()
             return {
-                username: "test",
-                numerator: monthly_budget,
-                denominator: yearly_goal,
-                result: (monthly_budget*12)/yearly_goal
+                numerator: user.get("budget"),
+                denominator: user.get("goal"),
+                claimed: user.get("claimed"),
+                multipler: (user.get("monthly_budget")*12)/user.get("yearly_goal") || .25
             }
+        },
+
+        updateUserStates: function(o) {
+            var change = {
+                pinUser: o.pinUser || null,
+                pinBoard: o.pinBoard || null,
+                monthly_budget: o.monthly_budget || null,
+                yearly_goal: o.yearly_goal || null,
+                }
+
+             var endpoint = this.url + "/pin-config?user=" + username + "&board=" + board
+                $.ajax({
+
+                url : endpoint,
+                type : 'PUT',
+                dataType:'json',
+                success : function(data) {              
+                    
+                    callback()
+                },
+                error : function(request,error)
+                {
+                    console.log("Request: "+JSON.stringify(request));
+                    callback()
+                }
+            });
         },
 
         doPinBoardsExist: function(username,callback) {

@@ -36,7 +36,7 @@ var pin = pinterest("readywater");
 // Mongoose
 var User = require('./model/User.js');
 var Claimed = require('./model/Claimed.js')
-mongoose.connect('mongodb://localhost/peddler-test');
+mongoose.connect(process.env.MONGODB_URI|| 'mongodb://localhost/peddler-test');
 
 
 // STRAVA METHODS (Auth and passport)
@@ -52,10 +52,12 @@ passport.deserializeUser(function(id, done) {
     });
 });
 
+var heroku = process.env.HEROKU_TRUE || false
+
 passport.use(new StravaStrategy({
     clientID: process.env.STRAVA_CLIENT_ID,
     clientSecret: process.env.STRAVA_CLIENT_SECRET,
-    callbackURL: "http://127.0.0.1:3000/auth/callback"
+    callbackURL: process.env.STRAVA_REDIRECT_URI || "http://127.0.0.1:3000/auth/callback"
   }, function(accessToken, refreshToken, profile, done) {
     User.findOneAndUpdate(
     		{id:profile.id}, 
@@ -134,6 +136,25 @@ app.get('/user',function(req,res,next){
 	User.find({id:req.user.id}, function(err,user) {
 		console.log("User obj",user)
 		// Query strava with updated info
+
+		// Let's get the sum of what's been claimed
+		claimedTotal = 0
+			Claimed.aggregate([
+			    { "$group": {
+			    	"_id": 1,
+			        "totalValue": { "$sum": "$cost" }
+			    }}
+			],
+			function(err, result) {
+				if(!err && result.length > 0) {
+					console.log("Total claimed results",result)
+						claimedTotal = result[0].totalValue || 0
+				} else {
+					console.log(err)
+				}
+			})
+
+
 		 strava.athletes.stats({id:req.user.id},function(err,payload) {
 		    if(!err) {
 		        // console.log(payload);
@@ -142,7 +163,7 @@ app.get('/user',function(req,res,next){
 		        obj.id = req.user.id
 		        obj.yearly_km = payload.ytd_ride_totals.distance/1000
 		        obj.budget = user.budget
-		        obj.claimed = user.items
+		        obj.claimed = claimedTotal
 
 		        // Update user w/ new distance
 				User.findOneAndUpdate(
@@ -173,7 +194,7 @@ app.get('/user/pin-exist',function(req,res,next){
 	var p = pinterest(req.query.user)
 	var b = []
 	p.getBoards(true, function(boards) {
-		console.log(boards.data)
+		// console.log(boards.data)
 		for(var v in boards.data) {
 			
 			// if(!boards[v]) continue
@@ -195,8 +216,8 @@ app.put('/user/pin-config',function(req,res,next) {
 //////////////////////////////////////
 
 app.get('/items/claim',function(req,res,next){
-	console.log("req.user",req.user)
-	console.log("req.session",req.session)
+	// console.log("req.user",req.user)
+	// console.log("req.session",req.session)
 
 	Claimed.findOneAndUpdate(
 	{id:req.query.pinid}, 
@@ -239,11 +260,16 @@ app.get('/items', function(req, res, next) {
 
 		pinterest.getDataForPins(keys,function(data) {
 			
+			console.log("FULLDUMP",data)
+
 			// Yeah... rewrite this
 			for (var v in data.data) {
 				var obj = {}
 				var o = data.data[v]
-				if(o.rich_metadata == null) continue
+				if(o.rich_metadata == null)  {
+					console.log("dropping", o)
+					continue
+				}
 
 				obj.id = o.id ? o.id : ""
 				obj.img = o.images["237x"].url ? o.images["237x"].url : ""
@@ -256,7 +282,7 @@ app.get('/items', function(req, res, next) {
 
 				obj.price = price_adjust
 			
-				console.log(obj)
+				// console.log(obj)
 				items.push(obj)
 			}
 
@@ -269,8 +295,8 @@ app.get('/items', function(req, res, next) {
 
 app.get('/claimed', function(req, res, next) {
 	var claim = []
-	console.log("CLAIMED req.user",req.user)
-	console.log("CLAIMED req.session",req.session)
+	// console.log("CLAIMED req.user",req.user)
+	// console.log("CLAIMED req.session",req.session)
 	Claimed.find(
 		{userid:req.user._id}, 
 		function(err,claimed){

@@ -55,10 +55,10 @@ peddler.Views = peddler.Views || {};
         },
 
         render: function() {
-        	var results = Math.round(parseFloat(this.collection.getStat().result) * 100) / 100
+        	var results = Math.round(parseFloat(this.collection.getUserStat().result) * 100) / 100
 
-        	$(this.el).find('#numerator').html(this.collection.getStat().numerator)
-        	$(this.el).find('#denominator').html(this.collection.getStat().denominator)
+        	$(this.el).find('#numerator').html(this.collection.getUserStat().numerator)
+        	$(this.el).find('#denominator').html(this.collection.getUserStat().denominator)
         	$(this.el).find('#results').html(results)
         	
         },
