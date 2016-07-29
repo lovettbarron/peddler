@@ -19,6 +19,7 @@ peddler.Views = peddler.Views || {};
         initialize: function(options) {
         	var _this = this;
             this.user = options.user;
+            this.claim = options.claim;
             this.fadeout = null;
 
 			this.collection.fetch({
@@ -42,16 +43,16 @@ peddler.Views = peddler.Views || {};
             })
 
 
-            this.listenTo(this.collection, 'reset', this.render);
+            this.listenTo(this.collection, 'change', this.render);
             this.listenTo(this.user, 'change', this.render);
+            this.listenTo(this.claim, 'change', this.render);
         },
 
         render: function() {
             var _this = this
             console.log("MaxPrice",_this.collection.getMaxValue())
-	        console.log("Rendering VisualView",this.collection)
             var _this = this
-            _this.collection.each(function(model,index,list){
+            _.each(_this.collection.getUnclaimed(),function(model,index,list){
                 // var o = data.property
                  $(_this.el).append(_this.template({
                     id: model.get("id"),
@@ -98,9 +99,10 @@ peddler.Views = peddler.Views || {};
             var _this = this
             var id = $(e.currentTarget).parent().attr('id')
             console.log('claim!',id)
-            this.collection.claimPin(id,function() {
+            this.collection.claimPin(id,function(success) {
                 $(_this.el).find("#"+id).fadeOut()
                 _this.user.fetch()
+                _this.claim.itemClaimed(id)
             })
         },
 
@@ -110,9 +112,5 @@ peddler.Views = peddler.Views || {};
         			.width($(window).width()*.90)
         	}
         },
-
-
-
     });
-
 })();

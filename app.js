@@ -34,7 +34,8 @@ app.use(methodOverride());
 var pin = pinterest("readywater");
 
 // Mongoose
-var User = require('./User.js');
+var User = require('./model/User.js');
+var Claimed = require('./model/Claimed.js')
 mongoose.connect('mongodb://localhost/peddler-test');
 
 
@@ -55,12 +56,7 @@ passport.use(new StravaStrategy({
     clientID: process.env.STRAVA_CLIENT_ID,
     clientSecret: process.env.STRAVA_CLIENT_SECRET,
     callbackURL: "http://127.0.0.1:3000/auth/callback"
-  },
-   // function(accessToken, refreshToken, profile, cb) {
-   //  User.findOrCreate({ stravaId: profile.id }, function (err, user) {
-   //    return cb(err, user);
-   //  });
-  function(accessToken, refreshToken, profile, done) {
+  }, function(accessToken, refreshToken, profile, done) {
     User.findOneAndUpdate(
     		{id:profile.id}, 
     		{id:profile.id}, 
@@ -128,9 +124,10 @@ app.get('/logout', function(req, res){
   req.logout();
   res.redirect('/');
 });
-//////////
-// USER //
-//////////
+
+//////////////////////////////////
+////////////// USER //////////////
+//////////////////////////////////
 app.get('/user',function(req,res,next){
 
 	// Grab the user info from the db
@@ -171,10 +168,6 @@ app.get('/user',function(req,res,next){
 	 })
 })
 
-app.put('user',function(req,res,next) {
-
-})
-
 // PINTEREST
 app.get('/user/pin-exist',function(req,res,next){
 	var p = pinterest(req.query.user)
@@ -197,41 +190,45 @@ app.put('/user/pin-config',function(req,res,next) {
 	res.sendStatus(200)
 })
 
-// ITEMS
-app.use('/items/claim',function(req,res,next){
+//////////////////////////////////////
+/////////////  Items  ////////////////
+//////////////////////////////////////
+
+app.get('/items/claim',function(req,res,next){
 	console.log("req.user",req.user)
 	console.log("req.session",req.session)
-	User.findByIdAndUpdate(
-		req.user.id, 
-		{$push: {"claimed":
-			{item_id: req.query.pinid, 
-			 date: Date.now, 
-			 cost: req.query.cost,}
-			}
-		}, 
+
+	Claimed.findOneAndUpdate(
+	{id:req.query.pinid}, 
+		{userid: req.user._id,
+		 stravaid: req.user.id,
+		 pinid: req.query.pinid, 
+		 link: req.query.link,
+		 cost: req.query.cost,
+		 img: req.query.img
+		},
 		{safe: true, upsert:true}, function(err,user){
 			if(err) {
-				console.log("claim fail :(")
-				res.redirect('/logout')
+				console.log("claim fail :(",err)
+				res.sendStatus(500)
 			} else {
 				console.log("Claim success",user)
 				res.sendStatus(200)
-				User.save()
 			}
-	})
+	})		
 })
 
 
-app.use('/items', function(req, res, next) {
-	
+app.get('/items', function(req, res, next) {
+	var items = []
+
 	User.find({id:req.user.id}, function(err,user) {
-		console.log("Returned user",user[0])
-		var p = pinterest(user[0].pin_username)
 		if(err) {
 			console.log("Some kind of error fetching pins",err)
-
+			res.sendStatus(400,err)
 		}
-		 
+		console.log("Returned user",user[0])
+		var p = pinterest(user[0].pin_username)
 
 	p.getPinsFromBoard(user[0].pin_board, true, function (pins) {
 		var keys = []
@@ -240,10 +237,8 @@ app.use('/items', function(req, res, next) {
 			keys.push(pins.data[v].id)
 		}
 
-		// console.log(keys)
-
 		pinterest.getDataForPins(keys,function(data) {
-			var items = []
+			
 			// Yeah... rewrite this
 			for (var v in data.data) {
 				var obj = {}
@@ -260,23 +255,38 @@ app.use('/items', function(req, res, next) {
 				var price_adjust = price.split("$")[0] == "A" ? price.split("$")[1] * .75 : price.split("$")[1] 
 
 				obj.price = price_adjust
-
 			
 				console.log(obj)
 				items.push(obj)
 			}
 
-
-			res.setHeader('Content-Type', 'application/json');
+			res.setHeader('Content-Type', 'application/json');	
 	    	res.send(JSON.stringify(items))
-		})
-
-    	console.log(pins)
-    	
+			})    	
 		});
-
 	})
 })
+
+app.get('/claimed', function(req, res, next) {
+	var claim = []
+	console.log("CLAIMED req.user",req.user)
+	console.log("CLAIMED req.session",req.session)
+	Claimed.find(
+		{userid:req.user._id}, 
+		function(err,claimed){
+			if(err) {
+				console.log("claim find fail :(",err)
+				console.log("claimed failed outcome",claimed)
+				res.sendStatus(400)
+			} else {
+				console.log("Claim find success",claimed)
+				res.setHeader('Content-Type', 'application/json');	
+				res.send(JSON.stringify(claimed))
+			}
+	})		
+
+	
+});
 
 app.listen(port);
 console.log('App running on port', port);

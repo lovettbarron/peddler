@@ -104,7 +104,7 @@ body {
 	height: 50px;
 }
 
-#history > .bucket > .item {
+#history > .bucket > div > .item {
 	float: left; clear: none;
 	height:50px; width: 50px;
 	margin:0 -25px 0 0;
@@ -112,6 +112,13 @@ body {
 	background: #8A86B0;
 	border: 4px solid #8A86B0;	
 	transition: 1s;	
+	/*display: none;*/
+}
+
+#history > .bucket > div > .item > a > img { 
+	width: 100%;
+	border-radius: 50px;
+	height: 100%;
 }
 
 #visualizer {

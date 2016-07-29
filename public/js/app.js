@@ -14,9 +14,16 @@ window.peddler = {
         this.Init.User = new this.Collections.UserCollection({
                 model: new this.Models.UserModel()
             });
-       
-        this.Init.pinCollection = new this.Collections.PinCollection({
-                model: new this.Models.PinModel()
+
+        this.Init.Claim = new this.Collections.ClaimCollection({
+                model: new this.Models.ClaimModel(),
+                user: this.Init.User,
+            });
+
+        this.Init.Pin = new this.Collections.PinCollection({
+                model: new this.Models.PinModel(),
+                user: this.Init.User,
+                claim: this.Init.Claim
             });
 
 
@@ -28,14 +35,16 @@ window.peddler = {
 
         this.Init.Visual = new this.Views.VisualView({
             el: '#visualizer',
-            collection:this.Init.pinCollection,
-            user: this.Init.User
+            collection:this.Init.Pin,
+            user: this.Init.User,
+            claim: this.Init.Claim
         });
 
         this.Init.Claimed = new this.Views.ClaimView({
             el: '#history',
-            collection:this.Init.pinCollection,
-            user: this.Init.User
+            collection:this.Init.Pin,
+            user: this.Init.User,
+            claim: this.Init.Claim
         });
 
         this.Init.Equation = new this.Views.EquationView({
