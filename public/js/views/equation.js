@@ -7,12 +7,12 @@ peddler.Views = peddler.Views || {};
         // template: JST['app/scripts/templates/card.ejs'],
         // errorTemplate: JST['app/scripts/templates/card-err.ejs'],
         events: {
-        	"input #numerator":"numeratorUpdate",
+        	"keydown #numerator":"numeratorUpdate",
         	"click #numerator":"numeratorClear",
-        	"input #denominator":"denominatorUpdate",
+        	"keydown #denominator":"denominatorUpdate",
         	"click #denominator":"denominatorClear",
         },
-        initialize: function() {
+        initialize: function(option) {
         	var _this = this
         	// this.user = this.options.user || {};
             this.collection.fetch({
@@ -25,16 +25,30 @@ peddler.Views = peddler.Views || {};
                     _this.renderError();
                 }
             })
-            $(document).on("input", ".numeric", function() {
+
+            $(".editable").on("input", ".numeric", function() {
 			    this.value = this.value.replace(/[^0-9\.]/g,'');
 			});
         },
 
+	    fetchChange: function(id) {
+            var _this = this
+            _this.collection.fetch({
+                succes: function(){
+                    console.log("SuccessFetchChange")
+                    _this.render()
+                },
+                error: function(){
+                    console.log("error fetching") 
+                }
+            })
+        },
+
         numeratorUpdate: function(e) {
-        	console.log("Updating numerator")
-        	 if(e.keyCode == 13){
+        	 if(e.keyCode === 13){
                 e.preventDefault();
-                this.render()
+                var val = $('.numerator').find('span').html()
+                this.updateUser({monthly_budget:val})
             }
         },
 
@@ -42,11 +56,11 @@ peddler.Views = peddler.Views || {};
         	$(this.el).find('#numerator').html("")
         },
 
-        denominatorUpdate:function() {
-        	console.log("Updating Denominator")
-        	if(e.keyCode == 13){
+        denominatorUpdate:function(e) {
+        	if(e.keyCode === 13){
                 e.preventDefault();
-                this.render()
+                var val = $('.denominator').find('span').html()
+                this.updateUser({yearly_goal:val})
             }
         },
 
@@ -55,6 +69,7 @@ peddler.Views = peddler.Views || {};
         },
 
         render: function() {
+        	// The math here just truncates
         	var results = Math.round(parseFloat(this.collection.getUserStat().result) * 100) / 100
 
         	$(this.el).find('#numerator').html(this.collection.getUserStat().numerator)
@@ -62,6 +77,18 @@ peddler.Views = peddler.Views || {};
         	$(this.el).find('#results').html(results)
         	
         },
+
+        updateUser: function(o) {
+        	// pinUser
+        	// pinBoard
+        	// monthly_budget
+        	// yearly_goal
+        	var _this = this
+        	_this.collection.updateUserStats(o,function() {
+        		_this.fetchChange()
+        	})
+        },
+
 
         resize: function() {
 

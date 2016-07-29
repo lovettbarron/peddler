@@ -36,7 +36,7 @@ var pin = pinterest("readywater");
 // Mongoose
 var User = require('./model/User.js');
 var Claimed = require('./model/Claimed.js')
-mongoose.connect(process.env.MONGODB_URI|| 'mongodb://localhost/peddler-test');
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/peddler-test');
 
 
 // STRAVA METHODS (Auth and passport)
@@ -187,6 +187,27 @@ app.get('/user',function(req,res,next){
 		    }
 		});
 	 })
+})
+
+app.put("/user/update",function(req,res,next){
+	console.log("Updating user",req.query.monthly_budget)
+	User.findOneAndUpdate(
+	{id:req.user.id}, 
+		{
+		 yrlydist: req.query.yearly_goal || req.user.yearly_goal,
+		 budget: parseInt(req.query.monthly_budget || req.user.budget,
+		 pin_username: req.query.pin_user || req.user.pin_username,
+		 pin_board: req.query.pin_board || req.user.pin_board,
+		},
+		{safe: true, upsert:false}, function(err,user){
+			if(err) {
+				console.log("user update fail :(",err)
+				res.sendStatus(500)
+			} else {
+				console.log("user update success",user)
+				res.sendStatus(200)
+			}
+	})		
 })
 
 // PINTEREST

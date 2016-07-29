@@ -6,8 +6,9 @@ var Schema = mongoose.Schema;
 var User = new Schema({
   id: String, // Strava iD
   yrlydist: Number,
-  spent: Number,
-  budget: Number,
+  yearly_goal: Number,
+  claimed: Number,
+  monthly_budget: Number,
   pin_username: String,
   pin_board: String
 },{

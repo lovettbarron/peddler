@@ -16,7 +16,7 @@ peddler.Collections = peddler.Collections || {};
         user: {},
 
         initialize: function(option) {
-            this.user = option.user || {}
+            // this.user = option.user || {}
             this.claim = option.claim || {}
         },
 

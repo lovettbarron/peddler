@@ -18,6 +18,7 @@ peddler.Collections = peddler.Collections || {};
         getUserStat: function() {
             // CHANGE
             var user = this.findWhere()
+            console.log("user check",user)
             return {
                 numerator: user.get("budget"),
                 denominator: user.get("goal"),
@@ -26,22 +27,27 @@ peddler.Collections = peddler.Collections || {};
             }
         },
 
-        updateUserStates: function(o) {
-            var change = {
-                pinUser: o.pinUser || null,
-                pinBoard: o.pinBoard || null,
-                monthly_budget: o.monthly_budget || null,
-                yearly_goal: o.yearly_goal || null,
-                }
+        updateUserStats: function(o,callback) {
+            // var change = {
+            //     pinUser: o.pinUser || null,
+            //     pinBoard: o.pinBoard || null,
+            //     monthly_budget: o.monthly_budget || null,
+            //     yearly_goal: o.yearly_goal || null,
+            //     }
 
-             var endpoint = this.url + "/pin-config?user=" + username + "&board=" + board
-                $.ajax({
+            var endpoint = this.url + "/update?"
 
+            if(o.pinUser) endpoint += "pin_user=" + o.pin_user + "&pin_board=" + o.pin_board + (!_.isUndefined(o.monthly_budget) || !_.isUndefined(o.yearly_goal)? "&" : "")
+            
+            if(o.monthly_budget) endpoint += "monthly_budget=" + o.monthly_budget + (!_.isUndefined(o.yearly_goal)? "&":"")
+            
+            if(o.yearly_goal) endpoint += "yearly_goal=" + o.yearly_goal
+                console.log(endpoint)
+            $.ajax({
                 url : endpoint,
                 type : 'PUT',
                 dataType:'json',
-                success : function(data) {              
-                    
+                success : function(data) { 
                     callback()
                 },
                 error : function(request,error)

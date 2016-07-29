@@ -13,14 +13,4 @@ var User = new Schema({
   pin_board: String
 });
 
-var Claimed = new Schema({
-	userid: Schema.Types.ObjectId,
-	stravaid: String,
-	pinid: String,
-	date: Date,
-	img: String,
-	link: String,
-	cost: Number,
-});
-
 module.exports = mongoose.model('users', User);
