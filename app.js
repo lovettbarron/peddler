@@ -164,38 +164,41 @@ app.get('/logout', function(req, res){
 app.get('/user',function(req,res,next){
 
 	// Grab the user info from the db
+	var userObj = {}
+
 	User.find({id:req.user.id}, function(err,user) {
-		console.log("User obj",user)
 		// Query strava with updated info
 		if(err) {
 			res.sendStatus(400)
 		} else {
 		// Let's get the sum of what's been claimed
+
+		userObj = user[0]
 		claimedTotal = 0
-			Claimed.aggregate([
-			    { "$group": {
-			    	"_id": 1,
-			        "totalValue": { "$sum": "$cost" }
-			    }}
-			],
-			function(err, result) {
-				if(!err && result.length > 0) {
-					console.log("Total claimed results",result)
-						claimedTotal = result[0].totalValue || 0
-				} else {
-					console.log(err)
-				}
-			})
+		Claimed.aggregate([
+		    { "$group": {
+		    	"_id": 1,
+		        "totalValue": { "$sum": "$cost" }
+		    }}
+		],
+		function(err, result) {
+			if(!err && result.length > 0) {
+				console.log("Total claimed results",result)
+					claimedTotal = result[0].totalValue || 0
+			} else {
+				console.log(err)
+			}
+		})
 
-
-		 strava.athletes.stats({id:req.user.id},function(err,payload) {
+		strava.athletes.stats({id:req.user.id},function(err,payload) {
 		    if(!err) {
 		        // console.log(payload);
-
+				console.log("User obj",userObj[0])
 		        var obj = {}
 		        obj.id = req.user.id
 		        obj.yearly_km = payload.ytd_ride_totals.distance/1000
-		        obj.budget = user.budget
+		        obj.monthly_budget = userObj.monthly_budget
+		        obj.yearly_goal = userObj.yearly_goal
 		        obj.claimed = claimedTotal
 
 		        // Update user w/ new distance
@@ -224,19 +227,29 @@ app.get('/user',function(req,res,next){
 })
 
 app.put("/user/update",function(req,res,next){
-	console.log("Updating user",req.query.monthly_budget)
+	console.log("Updating user",req.query)
+
+	var update = function() {
+	 	if(typeof req.query.yearly_goal !== "undefined") 
+	 		return {yearly_goal:req.query.yearly_goal}
+	 	else if(typeof req.query.monthly_budget !== "undefined")
+	 		return {monthly_budget:req.query.monthly_budget}
+ 		else if(typeof req.query.pin_username !== "undefined") 
+ 			return {pin_username:req.query.pin_user}
+		else if(typeof req.query.pin_board !== "undefined") 
+			return {pin_board:req.query.pin_board}
+		else {
+			console.log("Nothin...",req.query)
+			return {}
+		}
+	}
+
+	console.log('updateQuery',update())
+
 	User.findOneAndUpdate(
 	{id:req.user.id}, 
-		function() {
-		 	if(typeof req.query.yearly_goal != "undefined") return {yearly_goal:req.query.yearly_goal}
-		 	else if(typeof req.query.monthly_budget != "undefined") return {monthly_budget:req.query.monthly_budget}
-	 		else if(typeof req.query.pin_username != "undefined") return {pin_username:req.query.pin_user}
- 			else if(typeof req.query.pin_board != "undefined") return {pin_board:req.query.pin_board}
- 			else {
- 				console.log("Nothin...",req.query)
- 			}
-		},
-		{safe: true, upsert:false}, function(err,user){
+		update(),
+		{upsert:true}, function(err,user){
 			if(err) {
 				console.log("user update fail :(",err)
 				res.sendStatus(500)

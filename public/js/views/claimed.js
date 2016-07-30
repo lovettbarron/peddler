@@ -36,7 +36,7 @@ peddler.Views = peddler.Views || {};
             this.claim.each(function(model,index,list){
                 // console.log(model)
                 count+= 1
-                console.log("Test filter",$(_this.el).find('.bucket').find("#"+model.get('id')))
+                // console.log("Test filter",$(_this.el).find('.bucket').find("#"+model.get('id')))
                 if($(_this.el).find('.bucket').find("#"+model.get('id')).length == 0) {
                     _this.renderClaim(model,count*100)    
                 }
@@ -61,7 +61,7 @@ peddler.Views = peddler.Views || {};
         renderClaim: function(model,delay){
             var _this = this
             var del = delay || 0    
-            console.log("renderClaim",model)
+            // console.log("renderClaim",model)
             $(_this.el).find(".bucket").append($('<div/>').html(_this.template({
                     id: model.get("id"),
                     link: model.get("link"),

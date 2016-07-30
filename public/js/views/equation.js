@@ -17,11 +17,9 @@ peddler.Views = peddler.Views || {};
         	// this.user = this.options.user || {};
             this.collection.fetch({
                 success: function() {
-                	console.log("Got user")
                     _this.render();
                 },
                 error: function() {
-                	console.log("Got user")
                     _this.renderError();
                 }
             })
@@ -29,6 +27,8 @@ peddler.Views = peddler.Views || {};
             $(".editable").on("input", ".numeric", function() {
 			    this.value = this.value.replace(/[^0-9\.]/g,'');
 			});
+
+			this.listenTo(this.collection, 'change', this.render);
         },
 
 	    fetchChange: function(id) {
@@ -70,7 +70,7 @@ peddler.Views = peddler.Views || {};
 
         render: function() {
         	// The math here just truncates
-        	var results = Math.round(parseFloat(this.collection.getUserStat().result) * 100) / 100
+        	var results = Math.round(parseFloat(this.collection.getUserStat().multipler) * 100) / 100
 
         	$(this.el).find('#numerator').html(this.collection.getUserStat().numerator)
         	$(this.el).find('#denominator').html(this.collection.getUserStat().denominator)

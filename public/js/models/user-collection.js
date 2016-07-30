@@ -18,12 +18,12 @@ peddler.Collections = peddler.Collections || {};
         getUserStat: function() {
             // CHANGE
             var user = this.findWhere()
-            console.log("user check",user)
+            // console.log("user check",user)
             return {
-                numerator: user.get("budget"),
-                denominator: user.get("goal"),
+                numerator: user.get("monthly_budget"),
+                denominator: user.get("yearly_goal"),
                 claimed: user.get("claimed"),
-                multipler: (user.get("monthly_budget")*12)/user.get("yearly_goal") || .25
+                multipler: parseFloat(user.get("monthly_budget")*12)/parseFloat(user.get("yearly_goal")) || .25
             }
         },
 

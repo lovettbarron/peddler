@@ -22,10 +22,10 @@ peddler.Collections = peddler.Collections || {};
 
         getUnclaimed: function() {
             var _this = this
-            console.log("pins",_this.pluck("id"))
-            console.log("claimed",_this.claim.pluck("pinid"))
+            // console.log("pins",_this.pluck("id"))
+            // console.log("claimed",_this.claim.pluck("pinid"))
             return _this.filter(function(obj){
-                console.log(obj)
+                // console.log(obj)
                 if(!_.contains(_this.claim.pluck("pinid"),obj.get('id'))) {
                     return obj
                 }
@@ -42,7 +42,7 @@ peddler.Collections = peddler.Collections || {};
 
             var price = this.findWhere({id:id})
 
-            var endpoint = this.url + "/claim?pinid=" + id + "&cost=" + price.get("price")+ "&img=" + price.get("img")
+            var endpoint = this.url + "/claim?pinid=" + id + "&cost=" + price.get("price")+ "&img=" + price.get("img") + "&link=" + price.get("link")
             console.log(endpoint)
 
             $.ajax({

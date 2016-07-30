@@ -52,6 +52,7 @@ peddler.Views = peddler.Views || {};
             var _this = this
             console.log("MaxPrice",_this.collection.getMaxValue())
             var _this = this
+            $(_this.el).find(".item").remove()
             _.each(_this.collection.getUnclaimed(),function(model,index,list){
                 // var o = data.property
                  $(_this.el).append(_this.template({
@@ -92,6 +93,13 @@ peddler.Views = peddler.Views || {};
                 }
             })
            
+        },
+
+        updateItems:function() {
+            var _this = this
+            _.each($(_this.el).find('.link'),function(list,iter){
+
+            })
         },
 
         onHover: function(e) {
