@@ -85,10 +85,10 @@ app.use('/auth/callback',
   	 User.findOneAndUpdate(
     		{id:req.user.id}, 
     		{id:req.user.id,
-    		pin_username: req.session.pinid,
-    		pin_board: req.session.pinboard
+    		// pin_username: req.session.pinid,
+    		// pin_board: req.session.pinboard
     		}, 
-    		{upsert:false}, function(err,user){
+    		{upsert:true}, function(err,user){
     			if(err) {
     				console.log("Failed to assoc pinterest w/ strava")
     				res.redirect('/logout')
@@ -96,6 +96,25 @@ app.use('/auth/callback',
     		})
 
     res.redirect('/');
+});
+
+app.use('/auth/pinterest', function(req, res,next) {
+  	 User.findOneAndUpdate(
+    		{id:req.user.id}, 
+    		{
+    		pin_username: req.session.pinid,
+    		pin_board: req.session.pinboard
+    		},
+    		{upsert:true}, function(err,user){
+    			console.log('found user for auth pinterest',user)
+    			if(err) {
+    				console.log("Failed to assoc pinterest w/ strava")
+    				res.redirect('/logout')
+    			} else {
+    			    res.redirect('/');
+
+    			}
+    		})
 });
 
 function authenticationMiddleware() {  
@@ -112,7 +131,19 @@ app.get('/', authenticationMiddleware(), function(req, res, next) {
 	// console.log("Rendering index")
 	console.log(req.session.pinid)
 	console.log(req.session.pinboard)
-    res.render('index');
+
+	User.findOne({id:req.user.id}, function (err, user) {
+	  if(err) {
+	  	res.redirect('/login')
+	  } else {
+		  if(user.pin_username == null) {
+	      	res.render('pin-auth');	
+	      } else {
+	      	res.render('index')
+	      }	
+	  }
+      
+    });
     // console.log(req.user)
 });
 
@@ -136,7 +167,9 @@ app.get('/user',function(req,res,next){
 	User.find({id:req.user.id}, function(err,user) {
 		console.log("User obj",user)
 		// Query strava with updated info
-
+		if(!user.pin_board || err) {
+			res.sendStatus(400)
+		} else {
 		// Let's get the sum of what's been claimed
 		claimedTotal = 0
 			Claimed.aggregate([
@@ -186,6 +219,7 @@ app.get('/user',function(req,res,next){
 		        console.log("Strava fail",err);
 		    }
 		});
+		}
 	 })
 })
 
@@ -232,7 +266,24 @@ app.get('/user/pin-exist',function(req,res,next){
 app.put('/user/pin-config',function(req,res,next) {
 	req.session.pinid = req.query.user
 	req.session.pinboard = req.query.board
-	res.sendStatus(200)
+	User.findOneAndUpdate(
+    		{id:req.user.id}, 
+    		{
+    		pin_username: req.query.user,
+    		pin_board: req.query.board
+    		},
+    		{upsert:true}, function(err,user){
+    			console.log('found user for auth pinterest',user)
+    			if(err) {
+    				console.log("Failed to assoc pinterest w/ strava")
+    				res.redirect('/logout')
+    				res.sendStatus(400)
+    			} else {
+    			    res.sendStatus(200)
+
+    			}
+    		})
+	// res.sendStatus(200)
 })
 
 //////////////////////////////////////
@@ -266,54 +317,60 @@ app.get('/items/claim',function(req,res,next){
 
 app.get('/items', function(req, res, next) {
 	var items = []
-
-	User.find({id:req.user.id}, function(err,user) {
-		if(err) {
+	console.log("req.user for /items",req.user)
+	User.findOne({id:req.user.id}, function(err,user) {
+		console.log("/items user",user)
+		if(err)  {
 			console.log("Some kind of error fetching pins",err)
 			res.sendStatus(400,err)
 		}
-		console.log("Returned user",user[0])
-		var p = pinterest(user[0].pin_username)
 
-	p.getPinsFromBoard(user[0].pin_board, true, function (pins) {
-		var keys = []
+		if(user.pin_username == null || user.pin_board == null) {
+			res.sendStatus(400,err)	
+		} else {
+		console.log("Returned user",user)
 
-		for (var v in pins.data) {
-			keys.push(pins.data[v].id)
-		}
+		var p = pinterest(user.pin_username)
+		p.getPinsFromBoard(user.pin_board, true, function (pins) {
+			var keys = []
 
-		pinterest.getDataForPins(keys,function(data) {
-			
-			console.log("FULLDUMP",data)
-
-			// Yeah... rewrite this
-			for (var v in data.data) {
-				var obj = {}
-				var o = data.data[v]
-				if(o.rich_metadata == null)  {
-					console.log("dropping", o)
-					continue
-				}
-
-				obj.id = o.id ? o.id : ""
-				obj.img = o.images["237x"].url ? o.images["237x"].url : ""
-				obj.link = o.link ? o.link : ""
-
-				var price = o.rich_metadata.products[0].offer_summary.price
-
-				// Adjust for the aussies only for now
-				var price_adjust = price.split("$")[0] == "A" ? price.split("$")[1] * .75 : price.split("$")[1] 
-
-				obj.price = price_adjust
-			
-				// console.log(obj)
-				items.push(obj)
+			for (var v in pins.data) {
+				keys.push(pins.data[v].id)
 			}
 
-			res.setHeader('Content-Type', 'application/json');	
-	    	res.send(JSON.stringify(items))
+			pinterest.getDataForPins(keys,function(data) {
+				
+				console.log("FULLDUMP",data)
+
+				// Yeah... rewrite this
+				for (var v in data.data) {
+					var obj = {}
+					var o = data.data[v]
+					if(o.rich_metadata == null)  {
+						console.log("dropping", o)
+						continue
+					}
+
+					obj.id = o.id ? o.id : ""
+					obj.img = o.images["237x"].url ? o.images["237x"].url : ""
+					obj.link = o.link ? o.link : ""
+
+					var price = o.rich_metadata.products[0].offer_summary.price
+
+					// Adjust for the aussies only for now
+					var price_adjust = price.split("$")[0] == "A" ? price.split("$")[1] * .75 : price.split("$")[1] 
+
+					obj.price = price_adjust
+				
+					// console.log(obj)
+					items.push(obj)
+				}
+
+				res.setHeader('Content-Type', 'application/json');	
+		    	res.send(JSON.stringify(items))
 			})    	
 		});
+		}
 	})
 })
 

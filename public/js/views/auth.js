@@ -9,7 +9,7 @@ peddler.Views = peddler.Views || {};
         events: {
             "click #pinterestUsername":"usernameClear",
         	"keydown #pinterestUsername":"usernameUpdate",
-            "change .boardList":"revealStrava"
+            "change .boardList":"registerPinterest"
         },
         cleared: false,
         initialize: function() {
@@ -53,6 +53,16 @@ peddler.Views = peddler.Views || {};
                 $(_this.el).find(".strava").show()    
             })
             
+        },
+
+        registerPinterest: function() {
+            var _this = this
+            var username = $(this.el).find("#pinterestUsername").html()
+            var board = $(this.el).find(".boardList").find(':selected').html()
+
+            this.collection.registerUserPinterestConfig(username,board,function() {
+                    window.location.href="/"
+            })
         },
 
         render: function() {

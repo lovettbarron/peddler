@@ -8,8 +8,8 @@ var User = new Schema({
   claimed: Number, // Number of used pinterest pins
   yearly_goal: {type:Number,default: 4000},
   monthly_budget: {type:Number,default: 100},
-  pin_username: String,
-  pin_board: String
+  pin_username: {type:String,default: null},
+  pin_board: {type:String,default: null}
 });
 
 module.exports = mongoose.model('users', User);

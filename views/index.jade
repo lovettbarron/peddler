@@ -36,14 +36,3 @@ block calculate
 			span.small $
 			span#results.result 0
 			span.small /km
-
-block authenticate
-	#auth.hide
-		.modal
-			.strava
-				div Link your Strava
-				a(href="/auth")
-					img(src="/img/strava.png")
-			.pinterest
-				div What's your Board
-				span.editable(contenteditable="true") Board ID
