@@ -197,6 +197,7 @@ app.get('/user',ensureAuthenticated,function(req,res,next){
 		})
 
 		strava.athletes.stats({id:req.user.id},function(err,payload) {
+			console.log("Athlete Payload:",payload,err)
 		    if(!err) {
 		        // console.log(payload);
 				console.log("User obj",userObj[0])
