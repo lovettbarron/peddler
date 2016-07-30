@@ -5,10 +5,9 @@ var Schema = mongoose.Schema;
 // create User Schema
 var User = new Schema({
   id: String, // Strava iD
-  claimed: [{item_id: String, date: Date, cost: Number}], // Number of used pinterest pins
-  yrlydist: Number,
-  spent: Number,
-  budget: Number,
+  claimed: Number, // Number of used pinterest pins
+  yearly_goal: {type:Number,default: 4000},
+  monthly_budget: {type:Number,default: 100},
   pin_username: String,
   pin_board: String
 });

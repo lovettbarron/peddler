@@ -193,11 +193,14 @@ app.put("/user/update",function(req,res,next){
 	console.log("Updating user",req.query.monthly_budget)
 	User.findOneAndUpdate(
 	{id:req.user.id}, 
-		{
-		 yrlydist: req.query.yearly_goal || req.user.yearly_goal,
-		 budget: parseInt(req.query.monthly_budget || req.user.budget,
-		 pin_username: req.query.pin_user || req.user.pin_username,
-		 pin_board: req.query.pin_board || req.user.pin_board,
+		function() {
+		 	if(typeof req.query.yearly_goal != "undefined") return {yearly_goal:req.query.yearly_goal}
+		 	else if(typeof req.query.monthly_budget != "undefined") return {monthly_budget:req.query.monthly_budget}
+	 		else if(typeof req.query.pin_username != "undefined") return {pin_username:req.query.pin_user}
+ 			else if(typeof req.query.pin_board != "undefined") return {pin_board:req.query.pin_board}
+ 			else {
+ 				console.log("Nothin...",req.query)
+ 			}
 		},
 		{safe: true, upsert:false}, function(err,user){
 			if(err) {
