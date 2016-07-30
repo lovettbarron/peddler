@@ -363,7 +363,7 @@ app.get('/items', ensureAuthenticated,function(req, res, next) {
 		console.log("Returned user",user)
 
 		var p = pinterest(user.pin_username)
-		board = String(user.pin_board).replace("\ufeff", "");
+		board = String(user.pin_board).replace("\\&([^;]{6})","")// .replace("\ufeff", "");
 		console.log("board",board)
 		p.getPinsFromBoard(board, true, function (pins) {
 			var keys = []
