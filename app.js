@@ -52,6 +52,11 @@ passport.deserializeUser(function(id, done) {
     });
 });
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/login')
+}
+
 var heroku = process.env.HEROKU_TRUE || false
 
 passport.use(new StravaStrategy({
@@ -162,7 +167,7 @@ app.get('/logout', function(req, res){
 //////////////////////////////////
 ////////////// USER //////////////
 //////////////////////////////////
-app.get('/user',function(req,res,next){
+app.get('/user',ensureAuthenticated,function(req,res,next){
 
 	// Grab the user info from the db
 	var userObj = {}
