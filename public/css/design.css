@@ -156,12 +156,22 @@ body {
 	transition: 1s;
 }
 
+#visualizer > .item > .label{ 
+	position:absolute;
+	top: -20px;left: 0px;
+	width: 100%;
+	text-align:center;
+	color: white;
+	font-size: .5em;
+}
+
 #visualizer > .marker > .label{ 
 	position:absolute;
 	top: 80px;left: -20px;
 	width: 50px;
 	text-align:center;
 	color: white;
+	font-size: .5em;
 }
 
 #visualizer > .item { 

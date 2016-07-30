@@ -6,7 +6,7 @@ peddler.Views = peddler.Views || {};
     'use strict';
 
     peddler.Views.VisualView = Backbone.View.extend({
-        template: _.template("<div id=\"<%= id %>\" class=\"item\" style=\"left: <%= index %>%!important; opacity: <%= viz %>\"><a href=\"<%= link %>\"><img src=\"<%= img %>\"></a></div>"),
+        template: _.template("<div id=\"<%= id %>\" class=\"item\" style=\"left: <%= index %>%!important; opacity: <%= viz %>\"><a href=\"<%= link %>\"><img src=\"<%= img %>\"></a><div class=\"label\">$<%= cost %></div></div>"),
         events: {
             'mouseenter .item': 'onHover',
             'mouseleave .item': 'offHover',
@@ -60,6 +60,7 @@ peddler.Views = peddler.Views || {};
                     link: model.get("link"),
                     img:model.get("img"),
                     index: (model.get("price")/(_this.collection.getMaxValue()+50))*100,
+                    cost: model.get("price"),
                     viz: (_this.getAvailableFund() >= _this.collection.findWhere({id:model.get("id")}).get('price')) ? "1." : "0.3"
                 }));
             })
@@ -78,7 +79,8 @@ peddler.Views = peddler.Views || {};
                  $(_this.el).find('.marker').css('left',function() {
                 var dolla = _this.getAvailableFund()
                 var vizDolla = dolla/(_this.collection.getMaxValue()+50)
-                $(_this.el).find(".marker > .label").html(parseInt(_this.getAvailableFund()))
+                var label = "$" + parseInt(_this.getAvailableFund()) + "<br>" + parseInt(_this.user.getUserStat().currentkm) + "km"
+                $(_this.el).find(".marker > .label").html(label)
                 console.log("dolla",dolla, "vizdolla",vizDolla)
                 if(vizDolla > .95) {
                     $(_this.el).find('#dolla').show()

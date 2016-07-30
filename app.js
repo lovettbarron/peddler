@@ -75,12 +75,12 @@ passport.use(new StravaStrategy({
   }
 ));
 
-app.use('/auth',
+app.get('/auth',
   passport.authenticate('strava'));
 
-app.use('/auth/callback', 
-  passport.authenticate('strava', { 
-  	failureRedirect: '/login' }),
+app.get('/auth/callback', 
+  passport.authenticate('strava',
+  	{ failureRedirect: '/login' }),
   function(req, res) {
   	 User.findOneAndUpdate(
     		{id:req.user.id}, 
@@ -92,13 +92,14 @@ app.use('/auth/callback',
     			if(err) {
     				console.log("Failed to assoc pinterest w/ strava")
     				res.redirect('/logout')
+    			} else {
+				    res.redirect('/');
     			}
     		})
 
-    res.redirect('/');
 });
 
-app.use('/auth/pinterest', function(req, res,next) {
+app.get('/auth/pinterest', function(req, res,next) {
   	 User.findOneAndUpdate(
     		{id:req.user.id}, 
     		{
