@@ -150,6 +150,14 @@ body {
 	transition: 1s;
 }
 
+#visualizer > .marker > .label{ 
+	position:absolute;
+	top: 80px;left: -20px;
+	width: 50px;
+	text-align:center;
+	color: white;
+}
+
 #visualizer > .item { 
 	position:absolute;
 	left: 35px;top:0;

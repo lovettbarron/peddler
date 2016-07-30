@@ -78,10 +78,13 @@ peddler.Views = peddler.Views || {};
                  $(_this.el).find('.marker').css('left',function() {
                 var dolla = _this.getAvailableFund()
                 var vizDolla = dolla/(_this.collection.getMaxValue()+50)
+                $(_this.el).find(".marker > .label").html(parseInt(_this.getAvailableFund()))
                 console.log("dolla",dolla, "vizdolla",vizDolla)
                 if(vizDolla > .95) {
                     $(_this.el).find('#dolla').show()
                     return "95%"
+                } else if(vizDolla <= 0) {
+                    return "5%"
                 } else {
                     $(_this.el).find('#dolla').hide()
                     return (vizDolla*100)+"%"
@@ -132,7 +135,9 @@ peddler.Views = peddler.Views || {};
 
             if(this.getAvailableFund() >= this.collection.findWhere({id:id}).get('price'))
             this.collection.claimPin(id,function(success) {
-                $(_this.el).find("#"+id).fadeOut()
+                $(_this.el).find("#"+id).fadeOut(function(o) {
+                    $(o).remove()
+                })
                 _this.user.fetch()
                 _this.claim.itemClaimed(id)
             })
