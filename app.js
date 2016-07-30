@@ -267,16 +267,18 @@ app.put("/user/update",function(req,res,next){
 app.get('/user/pin-exist',function(req,res,next){
 	var p = pinterest(req.query.user)
 	var b = []
-	p.getBoards(true, function(boards) {
-		// console.log(boards.data)
-		for(var v in boards.data) {
-			
-			// if(!boards[v]) continue
-			b.push(String(boards.data[v].href).split('/')[2])
-		}
+	try { 
+		p.getBoards(false, function(boards) {
+			for(var v in boards.data) {
+				b.push(String(boards.data[v].href).split('/')[2])
+			}
+			res.setHeader('Content-Type', 'application/json');
+	    	res.send(JSON.stringify(b))
+		})
+	} catch(e) {
 		res.setHeader('Content-Type', 'application/json');
-    	res.send(JSON.stringify(b))
-	})
+	    	res.send("No Boards or error")
+	}
 })
 
 app.put('/user/pin-config',function(req,res,next) {
