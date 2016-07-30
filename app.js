@@ -128,8 +128,7 @@ function authenticationMiddleware() {
     if (req.isAuthenticated()) {
       return next()
     }
-    // res.redirect('/login')
-    res.sendStatus(400)
+    res.redirect('/login')
   }
 }
 
