@@ -66,12 +66,14 @@ passport.use(new StravaStrategy({
   }, function(accessToken, refreshToken, profile, done) {
     User.findOneAndUpdate(
     		{id:profile.id}, 
-    		{id:profile.id}, 
+    		{id:profile.id,
+    			access_token: accessToken}, 
     		{upsert:true}, function(err, user) {
       if(err) {
         return done(err);
       } else {
         return done(null, user);
+        console.log("Set user with id",profile.id,"and token",accessToken)
       }
     });
     // process.nextTick(function () {
@@ -96,6 +98,7 @@ app.get('/auth/callback',
     		{upsert:true}, function(err,user){
     			if(err) {
     				console.log("Failed to assoc pinterest w/ strava")
+    				// process.env.STRAVA_ACCESS_TOKEN = 
     				res.redirect('/logout')
     			} else {
 				    res.redirect('/');
@@ -195,8 +198,8 @@ app.get('/user',ensureAuthenticated,function(req,res,next){
 				console.log(err)
 			}
 		})
-		console.log("will request user id at",req.user.id, user )
-		strava.athletes.stats({id:req.user.id},function(err,payload) {
+		console.log("will request user id at",req.user.id, userObj )
+		strava.athletes.stats({id:userObj.id,'access_token':userObj.access_token},function(err,payload) {
 			console.log("Athlete Payload:",payload,err)
 		    if(!err) {
 		        // console.log(payload);
