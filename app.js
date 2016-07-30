@@ -167,7 +167,7 @@ app.get('/user',function(req,res,next){
 	User.find({id:req.user.id}, function(err,user) {
 		console.log("User obj",user)
 		// Query strava with updated info
-		if(!user.pin_board || err) {
+		if(err) {
 			res.sendStatus(400)
 		} else {
 		// Let's get the sum of what's been claimed

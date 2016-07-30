@@ -6,7 +6,7 @@ peddler.Views = peddler.Views || {};
     'use strict';
 
     peddler.Views.VisualView = Backbone.View.extend({
-        template: _.template("<div id=\"<%= id %>\" class=\"item\" style=\"left: <%= index %>%!important\"><a href=\"<%= link %>\"><img src=\"<%= img %>\"></a></div>"),
+        template: _.template("<div id=\"<%= id %>\" class=\"item\" style=\"left: <%= index %>%!important; opacity: <%= viz %>\"><a href=\"<%= link %>\"><img src=\"<%= img %>\"></a></div>"),
         events: {
             'mouseenter .item': 'onHover',
             'mouseleave .item': 'offHover',
@@ -58,10 +58,16 @@ peddler.Views = peddler.Views || {};
                     id: model.get("id"),
                     link: model.get("link"),
                     img:model.get("img"),
-                    index: (model.get("price")/(_this.collection.getMaxValue()+50))*100
+                    index: (model.get("price")/(_this.collection.getMaxValue()+50))*100,
+                    viz: (_this.getAvailableFund() >= _this.collection.findWhere({id:model.get("id")}).get('price')) ? "1." : "0.3"
                 }));
             })
             this.updateMarker()
+        },
+
+        getAvailableFund: function() {
+            var _this = this
+            return ((_this.user.pluck("yearly_km")*_this.user.getUserStat().multipler)-_this.user.getUserStat().claimed)
         },
 
         updateMarker: function() {
@@ -69,7 +75,7 @@ peddler.Views = peddler.Views || {};
             this.user.fetch({
                 success: function() {
                  $(_this.el).find('.marker').css('left',function() {
-                var dolla = ((_this.user.pluck("yearly_km")*_this.user.getUserStat().multipler)-_this.user.getUserStat().claimed)
+                var dolla = _this.getAvailableFund()
                 var vizDolla = dolla/(_this.collection.getMaxValue()+50)
                 console.log("dolla",dolla, "vizdolla",vizDolla)
                 if(vizDolla > .95) {
@@ -90,15 +96,14 @@ peddler.Views = peddler.Views || {};
 
         onHover: function(e) {
             var _this = this
-            // if($(e.currentTarget).hasClass('link')) {
-            clearTimeout(_this.fadeout)
-            //     console.log("canceled")
-            // }
-            $(this.el).find('.link').css("left", function() {
-                return $(e.currentTarget).css('left')
-            }).attr('id',function(){
-                return $(e.currentTarget).attr('id')
-            }).fadeIn()
+            if((_this.getAvailableFund() >= _this.collection.findWhere({id:$(e.currentTarget).attr("id")}).get('price'))) {
+                clearTimeout(_this.fadeout)
+                $(this.el).find('.link').css("left", function() {
+                    return $(e.currentTarget).css('left')
+                }).attr('id',function(){
+                    return $(e.currentTarget).attr('id')
+                }).fadeIn()
+            }
         },
 
         offHover: function(e) {
@@ -114,6 +119,10 @@ peddler.Views = peddler.Views || {};
             var _this = this
             var id = $(e.currentTarget).parent().attr('id')
             console.log('claim!',id)
+
+            console.log("Cost of claimed",this.collection.findWhere({id:id}).get('price'))
+
+            if(this.getAvailableFund() >= this.collection.findWhere({id:id}).get('price'))
             this.collection.claimPin(id,function(success) {
                 $(_this.el).find("#"+id).fadeOut()
                 _this.user.fetch()
