@@ -201,6 +201,8 @@ app.get('/user',function(req,res,next){
 		        obj.monthly_budget = userObj.monthly_budget
 		        obj.yearly_goal = userObj.yearly_goal
 		        obj.claimed = claimedTotal
+		        obj.pinuser = userObj.pin_username
+		        obj.pinboard =  userObj.pin_board
 
 		        // Update user w/ new distance
 				User.findOneAndUpdate(

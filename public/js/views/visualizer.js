@@ -25,7 +25,6 @@ peddler.Views = peddler.Views || {};
 			this.collection.fetch({
                 success: function() {
                     _this.render();
-
                 },
                 error: function() {
                     _this.renderError();

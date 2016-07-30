@@ -24,7 +24,9 @@ peddler.Collections = peddler.Collections || {};
                 denominator: user.get("yearly_goal"),
                 claimed: user.get("claimed"),
                 multipler: parseFloat(user.get("monthly_budget")*12)/parseFloat(user.get("yearly_goal")) || .25,
-                currentkm: user.get("yearly_km")
+                currentkm: user.get("yearly_km"),
+                pinuser: user.get("pinuser"),
+                pinboard: user.get("pinboard")
             }
         },
 

@@ -17,8 +17,11 @@ peddler.Views = peddler.Views || {};
 
             this.claim.fetch({
                 success: function() {
-                    _this.render();
-
+                    _this.user.fetch({
+                        success: function() {
+                        _this.render();
+                        }
+                    })
                 },
                 error: function() {
                     _this.renderError();
@@ -33,6 +36,11 @@ peddler.Views = peddler.Views || {};
             var _this = this
             // console.log("claim",this.claim)
             var count = 0
+
+            var p = $(_this.el).find('.pin')
+            p.find('.user').html(_this.user.getUserStat().pinuser)
+            p.find('.board').html(_this.user.getUserStat().pinboard)
+
             this.claim.each(function(model,index,list){
                 // console.log(model)
                 count+= 1
