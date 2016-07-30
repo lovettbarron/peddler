@@ -174,7 +174,7 @@ app.get('/user',ensureAuthenticated,function(req,res,next){
 
 	User.find({id:req.user.id}, function(err,user) {
 		// Query strava with updated info
-		if(err) {
+		if(err || user.length < 1) {
 			res.sendStatus(400)
 		} else {
 		// Let's get the sum of what's been claimed
