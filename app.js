@@ -186,6 +186,9 @@ app.get('/user',ensureAuthenticated,function(req,res,next){
 		userObj = user[0]
 		claimedTotal = 0
 		Claimed.aggregate([
+		   { $match: {
+		        id: user.id
+		    }},
 		    { "$group": {
 		    	"_id": 1,
 		        "totalValue": { "$sum": "$cost" }
