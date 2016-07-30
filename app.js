@@ -64,6 +64,7 @@ passport.use(new StravaStrategy({
     clientSecret: process.env.STRAVA_CLIENT_SECRET,
     callbackURL: process.env.STRAVA_REDIRECT_URI || "http://127.0.0.1:3000/auth/callback"
   }, function(accessToken, refreshToken, profile, done) {
+  	console.log("user get!",accessToken,profile)
     User.findOneAndUpdate(
     		{id:profile.id}, 
     		{id:profile.id,
