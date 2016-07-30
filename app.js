@@ -128,7 +128,8 @@ function authenticationMiddleware() {
     if (req.isAuthenticated()) {
       return next()
     }
-    res.redirect('/login')
+    // res.redirect('/login')
+    res.sendStatus(400)
   }
 }
 
@@ -235,7 +236,7 @@ app.get('/user',ensureAuthenticated,function(req,res,next){
 	 })
 })
 
-app.put("/user/update",function(req,res,next){
+app.put("/user/update",ensureAuthenticated,function(req,res,next){
 	console.log("Updating user",req.query)
 
 	var update = function() {
@@ -270,7 +271,7 @@ app.put("/user/update",function(req,res,next){
 })
 
 // PINTEREST
-app.get('/user/pin-exist',function(req,res,next){
+app.get('/user/pin-exist',ensureAuthenticated,function(req,res,next){
 	var p = pinterest(req.query.user)
 	var b = []
 	try { 
@@ -288,7 +289,7 @@ app.get('/user/pin-exist',function(req,res,next){
 	}
 })
 
-app.put('/user/pin-config',function(req,res,next) {
+app.put('/user/pin-config',ensureAuthenticated,function(req,res,next) {
 	req.session.pinid = req.query.user
 	req.session.pinboard = req.query.board
 	User.findOneAndUpdate(
@@ -315,7 +316,7 @@ app.put('/user/pin-config',function(req,res,next) {
 /////////////  Items  ////////////////
 //////////////////////////////////////
 
-app.get('/items/claim',function(req,res,next){
+app.get('/items/claim',ensureAuthenticated,function(req,res,next){
 	// console.log("req.user",req.user)
 	// console.log("req.session",req.session)
 
@@ -340,7 +341,7 @@ app.get('/items/claim',function(req,res,next){
 })
 
 
-app.get('/items', function(req, res, next) {
+app.get('/items', ensureAuthenticated,function(req, res, next) {
 	var items = []
 	console.log("req.user for /items",req.user)
 	User.findOne({id:req.user.id}, function(err,user) {
@@ -399,7 +400,7 @@ app.get('/items', function(req, res, next) {
 	})
 })
 
-app.get('/claimed', function(req, res, next) {
+app.get('/claimed', ensureAuthenticated, function(req, res, next) {
 	var claim = []
 	// console.log("CLAIMED req.user",req.user)
 	// console.log("CLAIMED req.session",req.session)
