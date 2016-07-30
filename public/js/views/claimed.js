@@ -38,6 +38,8 @@ peddler.Views = peddler.Views || {};
             var count = 0
 
             var p = $(_this.el).find('.pin')
+            var link = "http://pinterest.com/"+_this.user.getUserStat().pinuser+"/"+_this.user.getUserStat().pinboard
+            p.find('a').attr('href',link)
             p.find('.user').html(_this.user.getUserStat().pinuser)
             p.find('.board').html(_this.user.getUserStat().pinboard)
 

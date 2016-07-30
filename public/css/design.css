@@ -105,6 +105,11 @@ body {
 	margin: -10px 0 0px 0;
 }
 
+#history > .pin a {
+	text-decoration: none;
+	color: white;
+}
+
 #history > .pin span {
 	font-size:.5em;
 	padding: 4px;
