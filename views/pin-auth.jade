@@ -1,0 +1,14 @@
+extends ./layout.jade
+
+block title
+	#peddler
+		//- h1 Peddler
+
+block authenticate
+	#auth
+		.modal
+			.pinterest
+				div What's your pinterest username?
+				div Pick a board
+				span#pinterestUsername.editable(contenteditable="true") Username
+				select.boardList.hide
