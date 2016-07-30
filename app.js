@@ -268,7 +268,7 @@ app.get('/user/pin-exist',function(req,res,next){
 	var p = pinterest(req.query.user)
 	var b = []
 	try { 
-		p.getBoards(false, function(boards) {
+		p.getBoards(true, function(boards) {
 			for(var v in boards.data) {
 				b.push(String(boards.data[v].href).split('/')[2])
 			}
@@ -276,8 +276,9 @@ app.get('/user/pin-exist',function(req,res,next){
 	    	res.send(JSON.stringify(b))
 		})
 	} catch(e) {
+		console.log("error in fetching pin exists",e)
 		res.setHeader('Content-Type', 'application/json');
-	    	res.send("No Boards or error")
+    	res.send("No Boards or error")
 	}
 })
 
