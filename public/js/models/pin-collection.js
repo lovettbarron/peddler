@@ -10,13 +10,9 @@ peddler.Collections = peddler.Collections || {};
         // model: peddler.Models.PinModel,s
 
     	url: '/items',
-
-    	selected: [],
-
-        user: {},
-
+        
         initialize: function(option) {
-            // this.user = option.user || {}
+            this.user = option.user || {}
             this.claim = option.claim || {}
         },
 
