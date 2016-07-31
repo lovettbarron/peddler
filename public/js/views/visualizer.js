@@ -73,7 +73,7 @@ peddler.Views = peddler.Views || {};
 
         updateMarker: function() {
             var _this = this
-            this.user.fetch({
+            _this.user.fetch({
                 success: function() {
                  $(_this.el).find('.marker').css('left',function() {
                 var dolla = _this.getAvailableFund()
@@ -141,6 +141,7 @@ peddler.Views = peddler.Views || {};
                 })
                 _this.user.fetch()
                 _this.claim.itemClaimed(id)
+                _this.updateMarker()
             })
         },
 

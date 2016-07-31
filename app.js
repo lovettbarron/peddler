@@ -185,26 +185,26 @@ app.get('/user',ensureAuthenticated,function(req,res,next){
 
 		userObj = user[0]
 		claimedTotal = 0
-		Claimed.aggregate([
+		Claimed.aggregate(
 		   { $match: {
-		        id: user.id
+		        "stravaid": userObj.id
 		    }},
 		    { "$group": {
 		    	"_id": 1,
 		        "totalValue": { "$sum": "$cost" }
-		    }}
-		],
+		    }},
 		function(err, result) {
 			if(!err && result.length > 0) {
-				console.log("Total claimed results",result)
+				console.log("Claimed aggr success",result)
 					claimedTotal = result[0].totalValue || 0
 			} else {
-				console.log(err)
+				console.log("Claimed aggr err",err)
 			}
 		})
-		console.log("will request user id at",req.user.id, userObj )
+		console.log("Claimed total",claimedTotal)
+		// console.log("will request user id at",req.user.id, userObj )
 		strava.athletes.stats({id:userObj.id,'access_token':userObj.access_token},function(err,payload) {
-			console.log("Athlete Payload:",payload,err)
+			// console.log("Athlete Payload:",payload,err)
 		    if(!err) {
 		        // console.log(payload);
 				console.log("User obj",userObj[0])
